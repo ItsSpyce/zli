@@ -3,17 +3,27 @@
   "module": "lib/index.ts",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "prebuild": "rimraf dist .tsbuildinfo",
+    "build": "bun build lib/index.ts --outdir dist --external zod --minify --tsconfig-override tsconfig.json && tsc",
+    "watch": "bun build lib/index.ts --outdir dist --external zod --watch",
+    "postbuild": "tsc"
+  },
   "exports": {
-    "default": "./lib/index.ts"
+    "default": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "devDependencies": {
-    "bun-types": "latest"
-  },
-  "peerDependencies": {
+    "@types/node": "^20.6.2",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "yargs-parser": "^21.1.1",
+    "yargs-parser": "^21.1.1"
+  },
+  "peerDependencies": {
     "zod": "^3.22.2"
   }
 }

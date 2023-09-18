@@ -1,28 +1,122 @@
 const parser = require('yargs-parser');
-import z from 'zod';
-import assert from 'assert';
-import {
-  ZliFactory,
-  ShorthandDefinitions,
-  Command,
-  EmptyOptions,
-  CommandInvokeFunction,
-  OptionsHelp,
-  OptionsShape,
-  Options,
-  WithHelp,
-  ArgumentsShape,
-  Arguments,
-  ParsedArguments,
-} from './types';
+import { z } from 'zod';
 import type { WriteStream } from 'tty';
-export * from './types';
 
 const TERMINAL_WIDTH = 80;
 
-class _ZliFactory<TGlobalOptions extends OptionsShape>
-  implements ZliFactory<TGlobalOptions>
-{
+/// Types
+export type EmptyOptions = {
+  //
+};
+
+export interface CommandInvokeFunction<
+  TArgs extends ArgumentsShape,
+  TOptions extends OptionsShape,
+  TGlobalOptions extends OptionsShape
+> {
+  (args: Arguments<TGlobalOptions & TArgs & TOptions>): void | Promise<void>;
+}
+
+export type ParsedArguments = {
+  [key: string]: string | boolean | number | Array<string | boolean | number>;
+} & {
+  _: Array<string>;
+};
+
+export type ArgumentsShape = {
+  [name: string]:
+    | z.ZodString
+    | z.ZodNumber
+    | z.ZodBoolean
+    | z.ZodOptional<z.ZodString | z.ZodNumber | z.ZodBoolean>
+    | z.ZodDefault<z.ZodString | z.ZodNumber | z.ZodBoolean>;
+};
+
+export type OptionsShape = {
+  [name: string]:
+    | z.ZodString
+    | z.ZodNumber
+    | z.ZodBoolean
+    | z.ZodOptional<z.ZodString | z.ZodNumber | z.ZodBoolean>
+    | z.ZodDefault<z.ZodString | z.ZodNumber | z.ZodBoolean>;
+};
+
+export type WithHelp<T extends OptionsShape> = T & {
+  help: z.ZodOptional<z.ZodBoolean>;
+};
+
+export type Arguments<TShape extends ArgumentsShape> = {
+  [key in keyof TShape]: z.TypeOf<TShape[key]>;
+};
+
+export type Options<TShape extends OptionsShape> = {
+  [key in keyof TShape]: z.TypeOf<TShape[key]>;
+};
+
+export type OptionsHelp<T extends OptionsShape> = {
+  [key in keyof T]: string;
+};
+
+export type ShorthandDefinitions<T extends OptionsShape> = {
+  [key in keyof T]: `-${string}`;
+};
+
+export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
+  command<
+    TArgs extends ArgumentsShape = EmptyOptions,
+    TOptions extends OptionsShape = EmptyOptions
+  >(
+    name: string,
+    cmd: (
+      cmd: Command<TArgs, TOptions, TGlobalOptions>
+    ) => Command<TArgs, TOptions, TGlobalOptions>
+  ): Zli<TGlobalOptions>;
+  options<TOptions extends OptionsShape>(opts: TOptions): Zli<TOptions>;
+  beforeInvoke(
+    fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
+  ): Zli<TGlobalOptions>;
+  exec(): Promise<void>;
+  help(): Zli<WithHelp<TGlobalOptions>>;
+  shorthands(
+    shorthands: ShorthandDefinitions<TGlobalOptions>
+  ): Zli<TGlobalOptions>;
+  showHelpOnNotFound(): Zli<TGlobalOptions>;
+  showHelpOnError(): Zli<TGlobalOptions>;
+}
+
+export interface Command<
+  TArgs extends ArgumentsShape = EmptyOptions,
+  TOptions extends OptionsShape = EmptyOptions,
+  TGlobalOptions extends OptionsShape = EmptyOptions
+> {
+  command<
+    TArgs2 extends ArgumentsShape = EmptyOptions,
+    TOptions2 extends OptionsShape = EmptyOptions
+  >(
+    name: string,
+    cmd: (
+      cmd: Command<TArgs2, TOptions2, TGlobalOptions>
+    ) => Command<TArgs2, TOptions2, TGlobalOptions>
+  ): Command<TArgs, TOptions, TGlobalOptions>;
+  help(help: OptionsHelp<TOptions>): Command<TArgs, TOptions, TGlobalOptions>;
+  description(description: string): Command<TArgs, TOptions, TGlobalOptions>;
+  arguments<TArgs extends ArgumentsShape = EmptyOptions>(
+    args: TArgs
+  ): Command<TArgs, TOptions, TGlobalOptions>;
+  options<TOptions extends OptionsShape>(
+    opts: TOptions
+  ): Command<TArgs, TOptions, TGlobalOptions>;
+  shorthands(
+    shorthands: ShorthandDefinitions<TOptions>
+  ): Command<TArgs, TOptions, TGlobalOptions>;
+  invoke(
+    fn: CommandInvokeFunction<TArgs, TOptions, TGlobalOptions>
+  ): Command<TArgs, TOptions, TGlobalOptions>;
+}
+
+/// Implementations
+
+class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   private readonly _commands = new Map<
     string,
     _Command<any, any, TGlobalOptions>
@@ -48,7 +142,7 @@ class _ZliFactory<TGlobalOptions extends OptionsShape>
     cmd: (
       cmd: Command<TArgs, TOptions, TGlobalOptions>
     ) => Command<TArgs, TOptions, TGlobalOptions>
-  ): _ZliFactory<TGlobalOptions> {
+  ): _Zli<TGlobalOptions> {
     const command = new _Command<TArgs, TOptions, TGlobalOptions>(name, this);
     const setupCommand = cmd(command) as _Command<
       TArgs,
@@ -59,44 +153,36 @@ class _ZliFactory<TGlobalOptions extends OptionsShape>
     return this;
   }
 
-  options<TOptions extends OptionsShape>(
-    opts: TOptions
-  ): _ZliFactory<TOptions> {
+  options<TOptions extends OptionsShape>(opts: TOptions): _Zli<TOptions> {
     //@ts-ignore
     this._globalOptions = opts;
     //@ts-ignore Because TS is sometimes stupid. They're literally the same extends rule :)
-    return this as _ZliFactory<TOptions>;
+    return this as _Zli<TOptions>;
   }
 
-  help(): _ZliFactory<WithHelp<TGlobalOptions>> {
+  help(): _Zli<WithHelp<TGlobalOptions>> {
     this._globalOptions ??= Object.create(null);
     this._globalShorthands ??= Object.create(null);
-    Object.defineProperty(this._globalOptions, 'help', {
-      get() {
-        return z.boolean().optional();
-      },
-    });
-    Object.defineProperty(this._globalShorthands, 'help', {
-      get() {
-        return '-h';
-      },
-    });
-    return this as _ZliFactory<WithHelp<TGlobalOptions>>;
+    // @ts-ignore
+    this._globalOptions!.help = z.boolean().optional();
+    // @ts-ignore
+    this._globalShorthands!.help = '-h';
+    return this as _Zli<WithHelp<TGlobalOptions>>;
   }
 
   shorthands(
     shorthands: ShorthandDefinitions<TGlobalOptions>
-  ): _ZliFactory<TGlobalOptions> {
+  ): _Zli<TGlobalOptions> {
     this._globalShorthands = shorthands;
     return this;
   }
 
-  showHelpOnNotFound(): _ZliFactory<TGlobalOptions> {
+  showHelpOnNotFound(): _Zli<TGlobalOptions> {
     this._showHelpOnNotFound = true;
     return this;
   }
 
-  showHelpOnError(): _ZliFactory<TGlobalOptions> {
+  showHelpOnError(): _Zli<TGlobalOptions> {
     this._showHelpOnError = true;
     return this;
   }
@@ -119,11 +205,12 @@ class _ZliFactory<TGlobalOptions extends OptionsShape>
     } else {
       this._stdout.write(output);
     }
+    this._stdout.write('\n');
   }
 
   beforeInvoke(
     fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
-  ): _ZliFactory<TGlobalOptions> {
+  ): _Zli<TGlobalOptions> {
     this._beforeInvoke = fn;
     return this;
   }
@@ -158,7 +245,7 @@ class _ZliFactory<TGlobalOptions extends OptionsShape>
           globalOptions
         );
         if (!didExec) {
-          this.write(`Command not found: ${this._formattedArgs._.join(' ')}\n`);
+          this.write(`Command not found: ${this._formattedArgs._.join(' ')}`);
           if (this._showHelpOnNotFound) {
             this.displayHelp();
           }
@@ -167,9 +254,18 @@ class _ZliFactory<TGlobalOptions extends OptionsShape>
         if (err.message === REQUIRED_ARGUMENT_FIRST_ERROR) {
           throw err;
         }
-        this.write(`[ERROR] ${err.message}\n`);
+        if (err instanceof z.ZodError) {
+          for (const zerr of err.errors) {
+            this.write(
+              `${zerr.message} ${zerr.path[0] ? `(${zerr.path[0]})` : ''}`
+            );
+          }
+        } else {
+          this.write(`[ERROR] ${err.message}`);
+        }
+
         if (this._showHelpOnError) {
-          this.displayHelp();
+          cmd.displayHelp();
         }
       }
     } else {
@@ -202,7 +298,7 @@ class _Command<
 
   constructor(
     private readonly _name: string,
-    private readonly _factory: _ZliFactory<TGlobalOptions>
+    private readonly _factory: _Zli<TGlobalOptions>
   ) {}
 
   private _getSubcommandWithNewArgs(
@@ -310,6 +406,18 @@ class _Command<
     return this;
   }
 
+  displayHelp() {
+    const help = buildHelpDisplay(
+      this._name,
+      this._commands,
+      this._description,
+      this._argsSchema,
+      this._optsSchema,
+      this._shorthands
+    );
+    this._factory.write(help);
+  }
+
   async exec(
     args: ParsedArguments,
     globalOptions: Options<TGlobalOptions>
@@ -319,23 +427,16 @@ class _Command<
     if (subcommand) {
       return await subcommand.exec(newArgs, globalOptions);
     }
-    if (newArgs.help) {
-      const help = buildHelpDisplay(
-        this._name,
-        this._commands,
-        this._description,
-        this._argsSchema,
-        this._optsSchema,
-        this._shorthands
-      );
-      this._factory.write(help);
+    // need to expand before anything because of '-h'
+    const expandedArgs = expandShorthandOptions(args, this._shorthands);
+    if (args.help) {
+      this.displayHelp();
       return true;
     }
     if (!this._invoke) {
       return false;
     }
     const parsedArgs = parseArguments(args, this._argsSchema);
-    const expandedArgs = expandShorthandOptions(args, this._shorthands);
     const parsedOptions = parseOptions(expandedArgs, this._optsSchema);
     const invokeArgs = { ...globalOptions, ...parsedArgs, ...parsedOptions };
     await this._invoke(invokeArgs);
@@ -343,14 +444,16 @@ class _Command<
   }
 }
 
-export function zli(): ZliFactory;
-export function zli(argv?: string[]): ZliFactory {
+export function zli(): Zli;
+export function zli(argv?: string[]): Zli {
   if (typeof argv === 'undefined') {
     argv = process.argv.slice(2);
   }
   const parsedArgs = camelCaseArgs(parser(argv));
-  return new _ZliFactory(parsedArgs, process.stdout);
+  return new _Zli(parsedArgs, process.stdout);
 }
+
+/// Helper functions
 
 function dashCase(str: string) {
   let result = '';
@@ -398,14 +501,22 @@ function parseArguments<TArgs extends ArgumentsShape>(
   const argumentsIterator = args._[Symbol.iterator]();
   for (const [key, shape] of Object.entries(schema)) {
     // this one is a bit rough because we have to turn an ordered array into an ordered argument list
-    parsedArgs[key] = shape.parse(argumentsIterator.next().value);
+    try {
+      parsedArgs[key] = shape.parse(argumentsIterator.next().value);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        for (const zerr of err.errors) {
+          zerr.path.push(key);
+        }
+        throw err;
+      }
+      throw err;
+    }
     if (
       shape instanceof z.ZodDefault &&
       typeof parsedArgs[key] === 'undefined'
     ) {
-      Object.defineProperty(parsedArgs, key, {
-        get: shape._def.defaultValue,
-      });
+      parsedArgs[key] = shape._def.defaultValue();
     }
   }
 
@@ -421,7 +532,17 @@ function parseOptions<TOptions extends OptionsShape>(
   }
   const parsedOptions = Object.create(null);
   for (const [key, shape] of Object.entries(schema)) {
-    parsedOptions[key] = shape.parse(options[key]);
+    try {
+      parsedOptions[key] = shape.parse(options[key]);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        for (const zerr of err.errors) {
+          zerr.path.push(key);
+        }
+        throw err;
+      }
+      throw err;
+    }
     if (shape instanceof z.ZodArray && !Array.isArray(parsedOptions[key])) {
       // building array
       const value = parsedOptions[key];
@@ -525,8 +646,6 @@ function buildHelpDisplay(
       result.push(name, `\t${description}`);
     }
   }
-
-  result.push('\n');
   return result;
 }
 
@@ -560,7 +679,9 @@ function mapObjectKeys<T extends Record<string, any>>(
   obj: T,
   mapFn: (key: string) => string
 ): T {
-  assert(!Array.isArray(obj), 'Cannot use an array in mapObjectKeys');
+  if (Array.isArray(obj)) {
+    throw new Error('Cannot use an array in mapObjectKeys');
+  }
   return mapObject(obj, (k, v) => [mapFn(k), v]);
 }
 
@@ -568,7 +689,9 @@ function mapObject<T extends Record<string, any>>(
   obj: T,
   mapFn: (key: string, value: any) => [key: string, value: any]
 ) {
-  assert(!Array.isArray(obj), 'Cannot use an array in mapObject');
+  if (Array.isArray(obj)) {
+    throw new Error('Cannot use an array in mapObject');
+  }
   return Object.keys(obj).reduce((acc, key) => {
     const [newKey, newValue] = mapFn(key, obj[key]);
     return {

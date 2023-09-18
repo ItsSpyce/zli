@@ -34,4 +34,5 @@ await zli()
       })
   )
   .showHelpOnNotFound()
+  .showHelpOnError()
   .exec();

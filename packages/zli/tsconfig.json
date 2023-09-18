@@ -5,22 +5,22 @@
     "target": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+    "emitDeclarationOnly": true,
     "composite": true,
     "strict": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
-    "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "types": [
-      "bun-types" // add Bun global
-    ],
-    "baseUrl": "./lib"
+    "outDir": "./dist",
+    "rootDir": "./lib",
+    "tsBuildInfoFile": ".tsbuildinfo"
   },
   "include": [
     "./lib"
+  ],
+  "exclude": [
+    "./lib/**/*.spec.ts"
   ]
 }
