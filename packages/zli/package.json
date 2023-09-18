@@ -1,0 +1,19 @@
+{
+  "name": "zli",
+  "module": "lib/index.ts",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "default": "./lib/index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "yargs-parser": "^21.1.1",
+    "zod": "^3.22.2"
+  }
+}
