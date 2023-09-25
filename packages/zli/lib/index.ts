@@ -5,24 +5,56 @@ import type { WriteStream } from 'tty';
 const TERMINAL_WIDTH = 80;
 
 /// Types
+/**
+ * Represents an empty options shape. This is the default.
+ */
 export type EmptyOptions = {
   //
 };
 
+/**
+ * Forwards `write` from node:tty:WriteStream
+ */
+export interface ZliWriteStream {
+  write(...args: Parameters<WriteStream['write']>): any | Promise<any>;
+}
+
+/**
+ * The command handler interface for a command
+ */
 export interface CommandInvokeFunction<
   TArgs extends ArgumentsShape,
   TOptions extends OptionsShape,
   TGlobalOptions extends OptionsShape
 > {
-  (args: Arguments<TGlobalOptions & TArgs & TOptions>): void | Promise<void>;
+  (
+    /**
+     * A collection of arguments in the order of TGlobalOptions -> TArgs -> TOptions
+     */
+    args: ParsedArguments & Arguments<TGlobalOptions & TArgs & TOptions>,
+    /**
+     * A secondary reference to the ZliWriteStream used
+     */
+    stdout: ZliWriteStream
+  ): void | Promise<void>;
 }
 
+/**
+ * Represents the base parsed args from yargs-parser
+ *
+ * @description
+ * All named options are returned as properties in the return object. Any non-option arguments
+ * are appended to `_` as a string, number, or boolean.
+ */
 export type ParsedArguments = {
   [key: string]: string | boolean | number | Array<string | boolean | number>;
 } & {
   _: Array<string>;
 };
 
+/**
+ * Represents an expected arguments shape for a command
+ */
 export type ArgumentsShape = {
   [name: string]:
     | z.ZodString
@@ -32,6 +64,9 @@ export type ArgumentsShape = {
     | z.ZodDefault<z.ZodString | z.ZodNumber | z.ZodBoolean>;
 };
 
+/**
+ * Represents an options shape for a command
+ */
 export type OptionsShape = {
   [name: string]:
     | z.ZodString
@@ -61,6 +96,17 @@ export type ShorthandDefinitions<T extends OptionsShape> = {
   [key in keyof T]: `-${string}`;
 };
 
+type InvokeMeta = {
+  showHelpOnError: boolean;
+  showHelpOnNotFound: boolean;
+  ignoreUnknownOptions: boolean;
+  header?: string;
+  footer?: string;
+};
+
+/**
+ * @desc The base factory around creating CLIs
+ */
 export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
   command<
     TArgs extends ArgumentsShape = EmptyOptions,
@@ -75,11 +121,15 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
   beforeInvoke(
     fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
   ): Zli<TGlobalOptions>;
-  exec(): Promise<void>;
+  afterInvoke(
+    fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
+  ): Zli<TGlobalOptions>;
+  exec(...args: string[]): Promise<void>;
   help(): Zli<WithHelp<TGlobalOptions>>;
   shorthands(
     shorthands: ShorthandDefinitions<TGlobalOptions>
   ): Zli<TGlobalOptions>;
+  version(version: string): Zli<TGlobalOptions>;
   showHelpOnNotFound(): Zli<TGlobalOptions>;
   showHelpOnError(): Zli<TGlobalOptions>;
 }
@@ -121,18 +171,29 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     string,
     _Command<any, any, TGlobalOptions>
   >();
-  private _showHelpOnNotFound = false;
-  private _showHelpOnError = false;
+  private readonly _meta: InvokeMeta = {
+    showHelpOnError: false,
+    showHelpOnNotFound: false,
+    ignoreUnknownOptions: false,
+  };
   private _globalOptions?: TGlobalOptions;
   private _globalShorthands?: ShorthandDefinitions<TGlobalOptions>;
+  private _version?: string;
   private _beforeInvoke?: (
+    opts: Options<TGlobalOptions>
+  ) => void | Promise<void>;
+  private _afterInvoke?: (
     opts: Options<TGlobalOptions>
   ) => void | Promise<void>;
 
   constructor(
-    private readonly _formattedArgs: ParsedArguments,
-    private readonly _stdout: WriteStream
+    private _formattedArgs: ParsedArguments,
+    private readonly _stdout: ZliWriteStream
   ) {}
+
+  getStdout() {
+    return this._stdout;
+  }
 
   command<
     TArgs extends ArgumentsShape = EmptyOptions,
@@ -178,12 +239,17 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   }
 
   showHelpOnNotFound(): _Zli<TGlobalOptions> {
-    this._showHelpOnNotFound = true;
+    this._meta.showHelpOnNotFound = true;
     return this;
   }
 
   showHelpOnError(): _Zli<TGlobalOptions> {
-    this._showHelpOnError = true;
+    this._meta.showHelpOnError = true;
+    return this;
+  }
+
+  version(version: string): _Zli<TGlobalOptions> {
+    this._version = version;
     return this;
   }
 
@@ -215,28 +281,50 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     return this;
   }
 
-  async exec(): Promise<void> {
-    if (
-      this._formattedArgs?.['help'] === true &&
-      this._formattedArgs._.length === 0
-    ) {
-      return this.displayHelp();
+  afterInvoke(
+    fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
+  ): _Zli<TGlobalOptions> {
+    this._afterInvoke = fn;
+    return this;
+  }
+
+  async exec(...args: string[]): Promise<void> {
+    if (args.length > 0) {
+      const parsedArgs = camelCaseArgs(parser(args));
+      if (typeof this._formattedArgs === 'undefined') {
+        this._formattedArgs = parsedArgs;
+      } else {
+        this._formattedArgs = { ...this._formattedArgs, ...parsedArgs };
+      }
     }
+
     const expandedArgs = expandShorthandOptions(
       this._formattedArgs,
       this._globalShorthands
     );
-    if (typeof expandedArgs === 'undefined') {
-      return;
+    if (
+      expandedArgs['help'] &&
+      this._formattedArgs._.length === 0 &&
+      this._globalOptions?.help
+    ) {
+      return this.displayHelp();
     }
-    const globalOptions = parseOptions(expandedArgs, this._globalOptions);
+    const globalOptions = parseOptions(
+      this._formattedArgs._.length > 0,
+      expandedArgs,
+      this._globalOptions
+    );
     if (typeof this._beforeInvoke !== 'undefined') {
       await this._beforeInvoke(globalOptions);
     }
     const cmd = this._commands.get(this._formattedArgs._[0]);
     if (typeof cmd !== 'undefined') {
+      if (expandedArgs['help'] && this._globalOptions?.help) {
+        return cmd.displayHelp();
+      }
       try {
-        const didExec = await cmd.exec(
+        await cmd.exec(
+          this._meta,
           {
             ...this._formattedArgs,
             ...expandedArgs,
@@ -244,35 +332,22 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
           },
           globalOptions
         );
-        if (!didExec) {
-          this.write(`Command not found: ${this._formattedArgs._.join(' ')}`);
-          if (this._showHelpOnNotFound) {
-            this.displayHelp();
-          }
-        }
-      } catch (err: any) {
-        if (err.message === REQUIRED_ARGUMENT_FIRST_ERROR) {
-          throw err;
-        }
-        if (err instanceof z.ZodError) {
-          for (const zerr of err.errors) {
-            this.write(
-              `${zerr.message} ${zerr.path[0] ? `(${zerr.path[0]})` : ''}`
-            );
-          }
-        } else {
+      } catch (err) {
+        if (err instanceof ZliError) {
+          this.write(err.message);
+        } else if (err instanceof Error) {
           this.write(`[ERROR] ${err.message}`);
         }
-
-        if (this._showHelpOnError) {
-          cmd.displayHelp();
-        }
       }
-    } else {
+    } else if (this._formattedArgs._.length > 0) {
       this.write(`Command not found: ${this._formattedArgs._[0]}`);
-      if (this._showHelpOnNotFound) {
+      if (this._meta.showHelpOnNotFound) {
         this.displayHelp();
       }
+    } else if (typeof this._version !== 'undefined') {
+      this._stdout.write(this._version);
+    } else if (this._globalOptions?.help) {
+      this.displayHelp();
     }
   }
 }
@@ -419,16 +494,16 @@ class _Command<
   }
 
   async exec(
+    meta: InvokeMeta,
     args: ParsedArguments,
     globalOptions: Options<TGlobalOptions>
   ): Promise<boolean> {
     assertNoRequiredArgsAfterOptional(this._argsSchema);
     const [subcommand, newArgs] = this._getSubcommandWithNewArgs(args);
     if (subcommand) {
-      return await subcommand.exec(newArgs, globalOptions);
+      return await subcommand.exec(meta, newArgs, globalOptions);
     }
-    // need to expand before anything because of '-h'
-    const expandedArgs = expandShorthandOptions(args, this._shorthands);
+    // args should have 'help' from the factory class
     if (args.help) {
       this.displayHelp();
       return true;
@@ -436,21 +511,80 @@ class _Command<
     if (!this._invoke) {
       return false;
     }
+    const expandedArgs = expandShorthandOptions(args, this._shorthands);
     const parsedArgs = parseArguments(args, this._argsSchema);
-    const parsedOptions = parseOptions(expandedArgs, this._optsSchema);
-    const invokeArgs = { ...globalOptions, ...parsedArgs, ...parsedOptions };
-    await this._invoke(invokeArgs);
+    const parsedOptions = parseOptions(
+      meta.ignoreUnknownOptions,
+      expandedArgs,
+      this._optsSchema
+    );
+    const invokeArgs = {
+      ...args,
+      ...globalOptions,
+      ...parsedArgs,
+      ...parsedOptions,
+    };
+    try {
+      await this._invoke(invokeArgs, this._factory.getStdout());
+    } catch (err: any) {
+      if (
+        err instanceof NoRequiredArgumentsAfterOptionalsError ||
+        err instanceof UnknownOptionError
+      ) {
+        throw err;
+      }
+      if (err instanceof z.ZodError) {
+        for (const zerr of err.errors) {
+          this._factory.write(
+            `${zerr.message} ${zerr.path[0] ? `(${zerr.path[0]})` : ''}`
+          );
+        }
+      } else {
+        this._factory.write(`[ERROR] ${err.message}`);
+      }
+
+      if (meta.showHelpOnError) {
+        this.displayHelp();
+      }
+      return false;
+    }
     return true;
   }
 }
 
-export function zli(): Zli;
-export function zli(argv?: string[]): Zli {
-  if (typeof argv === 'undefined') {
-    argv = process.argv.slice(2);
+/// Errors
+
+class ZliError extends Error {}
+
+export class NoRequiredArgumentsAfterOptionalsError extends ZliError {
+  constructor() {
+    super('Cannot have required arguments after optional');
   }
-  const parsedArgs = camelCaseArgs(parser(argv));
-  return new _Zli(parsedArgs, process.stdout);
+}
+
+export class UnknownOptionError extends ZliError {
+  constructor(option: string) {
+    super(`Unknown option: --${option}`);
+  }
+}
+
+export class IncorrectUsageError extends ZliError {}
+
+export type ZliOptions = {
+  argv?: string[];
+  stdout?: ZliWriteStream;
+};
+
+export function zli(opts?: ZliOptions): Zli {
+  opts ??= {};
+  if (typeof opts.argv === 'undefined') {
+    opts.argv = [];
+  }
+  if (typeof opts.stdout === 'undefined') {
+    opts.stdout = process.stdout;
+  }
+  const parsedArgs = camelCaseArgs(parser(opts.argv));
+  return new _Zli(parsedArgs, opts.stdout!);
 }
 
 /// Helper functions
@@ -498,25 +632,35 @@ function parseArguments<TArgs extends ArgumentsShape>(
     return args as Arguments<TArgs>;
   }
   const parsedArgs = Object.create(null);
-  const argumentsIterator = args._[Symbol.iterator]();
-  for (const [key, shape] of Object.entries(schema)) {
-    // this one is a bit rough because we have to turn an ordered array into an ordered argument list
+  const schemaDefinitions = Object.entries(schema);
+  const requiredArgsCount = schemaDefinitions.filter(
+    ([_, shape]) =>
+      !shape.isOptional() ||
+      (shape instanceof z.ZodDefault &&
+        typeof shape._def.defaultValue() !== 'undefined')
+  ).length;
+  if (args._.length < requiredArgsCount) {
+    throw new IncorrectUsageError(
+      `Received ${args._.length}, expected ${requiredArgsCount}`
+    );
+  }
+  for (let i = 0; i < args._.length; i++) {
+    const value = args._[i];
+    const schema = schemaDefinitions[i];
+    if (typeof schema === 'undefined') {
+      // we don't try to parse and have no more left, just return what we have
+      return parsedArgs;
+    }
+    const [key, shape] = schemaDefinitions[i];
     try {
-      parsedArgs[key] = shape.parse(argumentsIterator.next().value);
+      parsedArgs[key] = shape.parse(value);
     } catch (err) {
       if (err instanceof z.ZodError) {
         for (const zerr of err.errors) {
           zerr.path.push(key);
         }
-        throw err;
       }
       throw err;
-    }
-    if (
-      shape instanceof z.ZodDefault &&
-      typeof parsedArgs[key] === 'undefined'
-    ) {
-      parsedArgs[key] = shape._def.defaultValue();
     }
   }
 
@@ -524,37 +668,44 @@ function parseArguments<TArgs extends ArgumentsShape>(
 }
 
 function parseOptions<TOptions extends OptionsShape>(
+  ignoreUnknownOptions: boolean,
   options: Options<TOptions>, // this is Options because it expects shorthands to be processed
   schema?: TOptions
 ): Options<TOptions> {
   if (typeof schema === 'undefined') {
-    return options as Options<TOptions>;
+    return options;
   }
   const parsedOptions = Object.create(null);
-  for (const [key, shape] of Object.entries(schema)) {
+  for (const [key, value] of Object.entries(options)) {
+    // ignore yargs keys
+    if (['_', '--'].includes(key)) {
+      continue;
+    }
+    if (!(key in schema) && !ignoreUnknownOptions) {
+      throw new UnknownOptionError(key);
+    }
     try {
-      parsedOptions[key] = shape.parse(options[key]);
+      const shape = schema[key];
+      if (shape instanceof z.ZodArray && !Array.isArray(value)) {
+        // building array
+        const parts = String(value).split(',').map(coerceString);
+        // @ts-ignore
+        options[key] = parts;
+      }
+      parsedOptions[key] = shape.parse(value);
     } catch (err) {
       if (err instanceof z.ZodError) {
         for (const zerr of err.errors) {
-          zerr.path.push(key);
+          zerr.path.push(`--${key}`);
         }
-        throw err;
       }
       throw err;
     }
-    if (shape instanceof z.ZodArray && !Array.isArray(parsedOptions[key])) {
-      // building array
-      const value = parsedOptions[key];
-      const parts = String(value).split(',').map(coerceString);
-      parsedOptions[key] = parts;
-    }
   }
+
   return parsedOptions;
 }
 
-const REQUIRED_ARGUMENT_FIRST_ERROR =
-  'Cannot have required arguments after optional';
 function assertNoRequiredArgsAfterOptional(args?: ArgumentsShape) {
   if (typeof args === 'undefined') {
     return;
@@ -567,7 +718,7 @@ function assertNoRequiredArgsAfterOptional(args?: ArgumentsShape) {
     ) {
       isReadingRequired = false;
     } else if (!isReadingRequired) {
-      throw new Error(REQUIRED_ARGUMENT_FIRST_ERROR);
+      throw new NoRequiredArgumentsAfterOptionalsError();
     }
   }
 }
