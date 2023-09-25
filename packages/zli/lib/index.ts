@@ -12,6 +12,17 @@ export type EmptyOptions = {
   //
 };
 
+type PermittedZodTypes =
+  | z.ZodString
+  | z.ZodEffects<z.ZodString, string>
+  | z.ZodNumber
+  | z.ZodEffects<z.ZodNumber, number>
+  | z.ZodBoolean
+  | z.ZodEffects<z.ZodBoolean, boolean>
+  | z.ZodOptional<PermittedZodTypes>
+  | z.ZodDefault<PermittedZodTypes>
+  | z.ZodArray<PermittedZodTypes>;
+
 /**
  * Forwards `write` from node:tty:WriteStream
  */
@@ -56,24 +67,14 @@ export type ParsedArguments = {
  * Represents an expected arguments shape for a command
  */
 export type ArgumentsShape = {
-  [name: string]:
-    | z.ZodString
-    | z.ZodNumber
-    | z.ZodBoolean
-    | z.ZodOptional<z.ZodString | z.ZodNumber | z.ZodBoolean>
-    | z.ZodDefault<z.ZodString | z.ZodNumber | z.ZodBoolean>;
+  [name: string]: PermittedZodTypes;
 };
 
 /**
  * Represents an options shape for a command
  */
 export type OptionsShape = {
-  [name: string]:
-    | z.ZodString
-    | z.ZodNumber
-    | z.ZodBoolean
-    | z.ZodOptional<z.ZodString | z.ZodNumber | z.ZodBoolean>
-    | z.ZodDefault<z.ZodString | z.ZodNumber | z.ZodBoolean>;
+  [name: string]: PermittedZodTypes;
 };
 
 export type WithHelp<T extends OptionsShape> = T & {
@@ -196,18 +197,18 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   }
 
   command<
-    TArgs extends ArgumentsShape = EmptyOptions,
-    TOptions extends OptionsShape = EmptyOptions
+    TArgs2 extends ArgumentsShape = EmptyOptions,
+    TOptions2 extends OptionsShape = EmptyOptions
   >(
     name: string,
     cmd: (
-      cmd: Command<TArgs, TOptions, TGlobalOptions>
-    ) => Command<TArgs, TOptions, TGlobalOptions>
+      cmd: Command<TArgs2, TOptions2, TGlobalOptions>
+    ) => Command<TArgs2, TOptions2, TGlobalOptions>
   ): _Zli<TGlobalOptions> {
-    const command = new _Command<TArgs, TOptions, TGlobalOptions>(name, this);
+    const command = new _Command<TArgs2, TOptions2, TGlobalOptions>(name, this);
     const setupCommand = cmd(command) as _Command<
-      TArgs,
-      TOptions,
+      TArgs2,
+      TOptions2,
       TGlobalOptions
     >;
     this._commands.set(name.toLowerCase(), setupCommand);
@@ -222,13 +223,12 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   }
 
   help(): _Zli<WithHelp<TGlobalOptions>> {
-    this._globalOptions ??= Object.create(null);
-    this._globalShorthands ??= Object.create(null);
-    // @ts-ignore
-    this._globalOptions!.help = z.boolean().optional();
-    // @ts-ignore
-    this._globalShorthands!.help = '-h';
-    return this as _Zli<WithHelp<TGlobalOptions>>;
+    return this.options({
+      ...(this._globalOptions || {}),
+      help: z.boolean().optional(),
+    }).shorthands({ ...(this._globalShorthands || {}), help: '-h' }) as _Zli<
+      WithHelp<TGlobalOptions>
+    >;
   }
 
   shorthands(
@@ -801,12 +801,7 @@ function buildHelpDisplay(
 }
 
 function getTypename(
-  shape:
-    | z.ZodString
-    | z.ZodBoolean
-    | z.ZodNumber
-    | z.ZodOptional<z.ZodString | z.ZodBoolean | z.ZodNumber>
-    | z.ZodDefault<z.ZodString | z.ZodBoolean | z.ZodNumber>
+  shape: PermittedZodTypes
 ): 'string' | 'number' | 'boolean' | 'undefined' {
   if (shape instanceof z.ZodOptional) {
     return getTypename(shape.unwrap());
