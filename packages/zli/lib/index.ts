@@ -158,7 +158,7 @@ export interface Command<
     opts: TOptions
   ): Command<TArgs, TOptions, TGlobalOptions>;
   shorthands(
-    shorthands: ShorthandDefinitions<TOptions>
+    shorthands: Partial<ShorthandDefinitions<TOptions>>
   ): Command<TArgs, TOptions, TGlobalOptions>;
   invoke(
     fn: CommandInvokeFunction<TArgs, TOptions, TGlobalOptions>
@@ -472,9 +472,9 @@ class _Command<
   }
 
   shorthands(
-    shorthands: ShorthandDefinitions<TOptions>
+    shorthands: Partial<ShorthandDefinitions<TOptions>>
   ): Command<TArgs, TOptions, TGlobalOptions> {
-    this._shorthands = shorthands;
+    this._shorthands = { ...(this._shorthands ?? {}), ...shorthands };
     return this;
   }
 
