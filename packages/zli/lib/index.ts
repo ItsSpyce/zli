@@ -322,19 +322,23 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       if (expandedArgs['help'] && this._globalOptions?.help) {
         return cmd.displayHelp();
       }
+      const args = {
+        ...this._formattedArgs,
+        ...expandedArgs,
+        _: this._formattedArgs._.slice(1),
+      };
       try {
-        await cmd.exec(
-          this._meta,
-          {
-            ...this._formattedArgs,
-            ...expandedArgs,
-            _: this._formattedArgs._.slice(1),
-          },
-          globalOptions
-        );
+        await cmd.exec(this._meta, args, globalOptions);
       } catch (err) {
         if (err instanceof ZliError) {
           this.write(err.message);
+        } else if (err instanceof z.ZodError) {
+          // for (const zerr of err.errors) {
+          //   this.write(
+          //     `${zerr.message} ${zerr.path[1] ? `(${zerr.path[1]})` : ''}`
+          //   );
+          // }
+          throw err;
         } else if (err instanceof Error) {
           this.write(`[ERROR] ${err.message}`);
         }
@@ -431,8 +435,8 @@ class _Command<
       this._factory
     );
     const setupCommand = cmd(command) as _Command<
-      TArgs,
-      TOptions,
+      TArgs2,
+      TOptions2,
       TGlobalOptions
     >;
     this._commands.set(name.toLowerCase(), setupCommand);
@@ -618,8 +622,11 @@ function expandShorthandOptions<TOptions extends OptionsShape>(
     return args as Options<TOptions>;
   }
   for (const [longhand, shorthand] of Object.entries(shorthands)) {
-    args[longhand] = args[shorthand!.substring(1)];
-    delete args[shorthand!.substring(1)];
+    const key = shorthand!.substring(1);
+    if (typeof args[key] !== 'undefined') {
+      args[longhand] = args[shorthand!.substring(1)];
+      delete args[shorthand!.substring(1)];
+    }
   }
   return args as Options<TOptions>;
 }
@@ -681,18 +688,24 @@ function parseOptions<TOptions extends OptionsShape>(
     if (['_', '--'].includes(key)) {
       continue;
     }
-    if (!(key in schema) && !ignoreUnknownOptions) {
-      throw new UnknownOptionError(key);
+    if (!(key in schema)) {
+      if (!ignoreUnknownOptions) {
+        throw new UnknownOptionError(key);
+      } else {
+        parsedOptions[key] = value;
+      }
     }
     try {
       const shape = schema[key];
       if (shape instanceof z.ZodArray && !Array.isArray(value)) {
         // building array
-        const parts = String(value).split(',').map(coerceString);
+        const parts = String(value)
+          .split(',')
+          .map((v) => coerce(v, shape));
         // @ts-ignore
         options[key] = parts;
       }
-      parsedOptions[key] = shape.parse(value);
+      parsedOptions[key] = coerce(value, shape);
     } catch (err) {
       if (err instanceof z.ZodError) {
         for (const zerr of err.errors) {
@@ -702,7 +715,6 @@ function parseOptions<TOptions extends OptionsShape>(
       throw err;
     }
   }
-
   return parsedOptions;
 }
 
@@ -847,26 +859,34 @@ function mapObject<T extends Record<string, any>>(
   }, Object.create(null));
 }
 
-function coerceString(s: string) {
-  const trimmed = s?.trim();
-  if (!trimmed || String(trimmed).length === 0) {
-    return undefined;
-  }
-  if (!isNaN(parseFloat(trimmed))) {
-    return parseFloat(trimmed);
-  }
-  if (!isNaN(parseInt(trimmed))) {
-    return parseInt(trimmed);
-  }
+function coerce(value: any, definition: PermittedZodTypes): unknown {
+  const trimmed = String(value).trim();
   const lowered = trimmed.toLowerCase();
-  if (['true', 'yes', 'y', '1', 'accept'].includes(lowered)) {
-    return true;
+  if (!trimmed || String(trimmed).length === 0) {
+    return definition.parse('');
   }
-  if (['false', 'no', 'n', '0', 'deny'].includes(lowered)) {
-    return false;
+  if (definition instanceof z.ZodBoolean) {
+    if (['true', 'yes', 'y', '1', 'accept', true, 1].includes(lowered)) {
+      return definition.parse(true);
+    } else if (['false', 'no', 'n', '0', 'deny', false, 0].includes(lowered)) {
+      return definition.parse(false);
+    } else {
+      return definition.parse(true);
+    }
+  } else if (definition instanceof z.ZodString) {
+    return definition.parse(String(trimmed));
+  } else if (definition instanceof z.ZodNumber) {
+    return definition.parse(parseInt(value));
   }
-  if (lowered === 'null') {
-    return null;
+  if (
+    definition instanceof z.ZodDefault ||
+    definition instanceof z.ZodOptional
+  ) {
+    return coerce(value, definition._def.innerType);
   }
-  return trimmed;
+  if (definition instanceof z.ZodArray) {
+    const array = value as Array<any>;
+    return array.map((v) => coerce(v, definition._def.type));
+  }
+  return definition.parse(trimmed);
 }

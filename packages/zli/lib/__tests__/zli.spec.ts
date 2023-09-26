@@ -156,4 +156,53 @@ describe('zli', () => {
 
     expect(stdout.read()).toMatch(/unknown option: --bar/i);
   });
+
+  test('renames shorthand arguments to longhand', async () => {
+    const stdout = mockWriteStream();
+    await zli({ stdout })
+      .command('foo', (cmd) =>
+        cmd
+          .options({
+            theAnswerToLife: z.number(),
+          })
+          .shorthands({
+            theAnswerToLife: '-l',
+          })
+          .invoke(({ theAnswerToLife }) => {
+            stdout.write(`${theAnswerToLife}`);
+          })
+      )
+      .exec('foo', '-l=42');
+
+    expect(stdout.read()).toBe('42');
+  });
+
+  test('creates an array when the option is required', async () => {
+    const stdout = mockWriteStream();
+    await zli({ stdout })
+      .command('sb', (cmd) =>
+        cmd
+          .options({
+            prepend: z.array(z.string()).default([]),
+            append: z.array(z.string()).default([]),
+          })
+          .shorthands({
+            prepend: '-p',
+            append: '-a',
+          })
+          .invoke(({ prepend, append, _ }) => {
+            stdout.write(`${prepend.join('')}${_}${append.join('')}`);
+          })
+      )
+      .exec(
+        'sb',
+        '--prepend=no',
+        '--prepend=no',
+        '--append=42',
+        '--append=42',
+        'what is the answer to life'
+      );
+
+    expect(stdout.read()).toBe('nonowhat is the answer to life4242');
+  });
 });
