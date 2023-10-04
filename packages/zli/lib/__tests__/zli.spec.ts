@@ -205,4 +205,40 @@ describe('zli', () => {
 
     expect(stdout.read()).toBe('nonowhat is the answer to life4242');
   });
+
+  test('outputs enum values properly in help', async () => {
+    const stdout = mockWriteStream();
+    await zli({ stdout })
+      .help()
+      .options({ environment: z.enum(['development', 'production']) })
+      .exec('-h');
+
+    expect(stdout.read()).toMatch(/development|production/i);
+  });
+
+  test('outputs beforeInvoke before processing a command', async () => {
+    const stdout = mockWriteStream();
+    await zli({ stdout })
+      .options({ environment: z.enum(['development', 'production']) })
+      .command('foo', (cmd) => cmd.invoke(() => stdout.write('Hello world!')))
+      .beforeInvoke(({ environment }) =>
+        stdout.write(`Running in environment: ${environment}\n`)
+      )
+      .exec('foo', '--environment=development');
+    expect(stdout.read()).toMatch(/^running in environment\: development/i);
+    expect(stdout.read()).toMatch(/hello world!$/i);
+  });
+
+  test('outputs afterInvoke after processing a command', async () => {
+    const stdout = mockWriteStream();
+    await zli({ stdout })
+      .options({ environment: z.enum(['development', 'production']) })
+      .command('foo', (cmd) => cmd.invoke(() => stdout.write('Hello world!')))
+      .afterInvoke(({ environment }) =>
+        stdout.write(`\nRan in environment: ${environment}`)
+      )
+      .exec('foo', '--environment=production');
+    expect(stdout.read()).toMatch(/^hello world!/i);
+    expect(stdout.read()).toMatch(/ran in environment\: production$/i);
+  });
 });

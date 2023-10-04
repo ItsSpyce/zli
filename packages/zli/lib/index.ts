@@ -1,5 +1,6 @@
 const parser = require('yargs-parser');
 import { z } from 'zod';
+import { camelCase, paramCase } from 'change-case';
 import type { WriteStream } from 'tty';
 
 const TERMINAL_WIDTH = 80;
@@ -19,6 +20,7 @@ type PermittedZodTypes =
   | z.ZodEffects<z.ZodNumber, number>
   | z.ZodBoolean
   | z.ZodEffects<z.ZodBoolean, boolean>
+  | z.ZodEnum<[string, ...string[]]>
   | z.ZodOptional<PermittedZodTypes>
   | z.ZodDefault<PermittedZodTypes>
   | z.ZodArray<PermittedZodTypes>;
@@ -94,7 +96,7 @@ export type OptionsHelp<T extends OptionsShape> = {
 };
 
 export type ShorthandDefinitions<T extends OptionsShape> = {
-  [key in keyof T]: `-${string}`;
+  [key in keyof T]?: `-${string}`;
 };
 
 type InvokeMeta = {
@@ -215,26 +217,27 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     return this;
   }
 
-  options<TOptions extends OptionsShape>(opts: TOptions): _Zli<TOptions> {
-    //@ts-ignore
-    this._globalOptions = opts;
-    //@ts-ignore Because TS is sometimes stupid. They're literally the same extends rule :)
-    return this as _Zli<TOptions>;
+  options<TOptions extends OptionsShape>(
+    opts: TOptions
+  ): _Zli<TGlobalOptions & TOptions> {
+    // @ts-ignore
+    this._globalOptions = { ...(this._globalOptions ?? {}), ...opts };
+    return this as _Zli<TGlobalOptions & TOptions>;
   }
 
   help(): _Zli<WithHelp<TGlobalOptions>> {
     return this.options({
-      ...(this._globalOptions || {}),
       help: z.boolean().optional(),
-    }).shorthands({ ...(this._globalShorthands || {}), help: '-h' }) as _Zli<
-      WithHelp<TGlobalOptions>
-    >;
+    }).shorthands({ help: '-h' }) as _Zli<WithHelp<TGlobalOptions>>;
   }
 
   shorthands(
     shorthands: ShorthandDefinitions<TGlobalOptions>
   ): _Zli<TGlobalOptions> {
-    this._globalShorthands = shorthands;
+    this._globalShorthands = {
+      ...(this._globalShorthands ?? {}),
+      ...shorthands,
+    };
     return this;
   }
 
@@ -298,26 +301,28 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       }
     }
 
+    const [runArg, ...restArgs] = this._formattedArgs._;
+
     const expandedArgs = expandShorthandOptions(
       this._formattedArgs,
       this._globalShorthands
     );
     if (
-      expandedArgs['help'] &&
-      this._formattedArgs._.length === 0 &&
-      this._globalOptions?.help
+      expandedArgs['help'] === true &&
+      typeof runArg === 'undefined' &&
+      typeof this._globalOptions?.help !== 'undefined'
     ) {
       return this.displayHelp();
     }
     const globalOptions = parseOptions(
-      this._formattedArgs._.length > 0,
+      typeof runArg !== 'undefined',
       expandedArgs,
       this._globalOptions
     );
     if (typeof this._beforeInvoke !== 'undefined') {
       await this._beforeInvoke(globalOptions);
     }
-    const cmd = this._commands.get(this._formattedArgs._[0]);
+    const cmd = this._commands.get(runArg);
     if (typeof cmd !== 'undefined') {
       if (expandedArgs['help'] && this._globalOptions?.help) {
         return cmd.displayHelp();
@@ -325,7 +330,7 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       const args = {
         ...this._formattedArgs,
         ...expandedArgs,
-        _: this._formattedArgs._.slice(1),
+        _: restArgs,
       };
       try {
         await cmd.exec(this._meta, args, globalOptions);
@@ -333,18 +338,16 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
         if (err instanceof ZliError) {
           this.write(err.message);
         } else if (err instanceof z.ZodError) {
-          // for (const zerr of err.errors) {
-          //   this.write(
-          //     `${zerr.message} ${zerr.path[1] ? `(${zerr.path[1]})` : ''}`
-          //   );
-          // }
-          throw err;
+          for (const zerr of err.errors) {
+            const [_, argName] = zerr.path;
+            this.write(`${zerr.message} ${argName ? `(${argName})` : ''}`);
+          }
         } else if (err instanceof Error) {
           this.write(`[ERROR] ${err.message}`);
         }
       }
-    } else if (this._formattedArgs._.length > 0) {
-      this.write(`Command not found: ${this._formattedArgs._[0]}`);
+    } else if (typeof runArg !== 'undefined') {
+      this.write(`Command not found: ${runArg}`);
       if (this._meta.showHelpOnNotFound) {
         this.displayHelp();
       }
@@ -352,6 +355,9 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       this._stdout.write(this._version);
     } else if (this._globalOptions?.help) {
       this.displayHelp();
+    }
+    if (typeof this._afterInvoke !== 'undefined') {
+      this._afterInvoke(globalOptions);
     }
   }
 }
@@ -568,7 +574,7 @@ export class NoRequiredArgumentsAfterOptionalsError extends ZliError {
 
 export class UnknownOptionError extends ZliError {
   constructor(option: string) {
-    super(`Unknown option: --${option}`);
+    super(`Unknown option: --${paramCase(option)}`);
   }
 }
 
@@ -593,25 +599,14 @@ export function zli(opts?: ZliOptions): Zli {
 
 /// Helper functions
 
-function dashCase(str: string) {
-  let result = '';
-  for (const c of str) {
-    if (c.toLowerCase() === c) {
-      result += c;
-    } else {
-      result += `-${c.toLowerCase()}`;
-    }
-  }
-  return result;
-}
-
 function camelCaseArgs(args: ParsedArguments): ParsedArguments {
-  return mapObjectKeys(args, (key) => {
-    if (['--', '_'].includes(key)) {
-      return key;
-    }
-    return parser.camelCase(key);
-  });
+  return Object.keys(args).reduce(
+    (acc, key) => ({
+      ...acc,
+      [['--', '_'].includes(key) ? key : camelCase(key)]: args[key],
+    }),
+    Object.create(null)
+  );
 }
 
 function expandShorthandOptions<TOptions extends OptionsShape>(
@@ -785,7 +780,7 @@ function buildHelpDisplay(
   if (typeof options !== 'undefined') {
     result.push('Options:');
     for (const [name, shape] of Object.entries(options)) {
-      const dashName = dashCase(name);
+      const dashName = paramCase(name);
       const nameToDisplay =
         typeof shorthands?.[name] !== 'undefined'
           ? `--${dashName}|${shorthands[name]}`
@@ -812,51 +807,29 @@ function buildHelpDisplay(
   return result;
 }
 
-function getTypename(
-  shape: PermittedZodTypes
-): 'string' | 'number' | 'boolean' | 'undefined' {
+function getTypename(shape: PermittedZodTypes): string {
   if (shape instanceof z.ZodOptional) {
     return getTypename(shape.unwrap());
   }
   if (shape instanceof z.ZodDefault) {
     return getTypename(shape.removeDefault());
   }
-  switch (shape._def.typeName) {
-    case z.ZodString.name:
-      return 'string';
-    case z.ZodBoolean.name:
-      return 'boolean';
-    case z.ZodNumber.name:
-      return 'number';
-    default:
-      return 'undefined';
+  if (shape instanceof z.ZodString) {
+    return 'string';
   }
-}
-
-function mapObjectKeys<T extends Record<string, any>>(
-  obj: T,
-  mapFn: (key: string) => string
-): T {
-  if (Array.isArray(obj)) {
-    throw new Error('Cannot use an array in mapObjectKeys');
+  if (shape instanceof z.ZodNumber) {
+    return 'number';
   }
-  return mapObject(obj, (k, v) => [mapFn(k), v]);
-}
-
-function mapObject<T extends Record<string, any>>(
-  obj: T,
-  mapFn: (key: string, value: any) => [key: string, value: any]
-) {
-  if (Array.isArray(obj)) {
-    throw new Error('Cannot use an array in mapObject');
+  if (shape instanceof z.ZodBoolean) {
+    return 'boolean';
   }
-  return Object.keys(obj).reduce((acc, key) => {
-    const [newKey, newValue] = mapFn(key, obj[key]);
-    return {
-      ...acc,
-      [newKey]: newValue,
-    };
-  }, Object.create(null));
+  if (shape instanceof z.ZodEnum) {
+    return shape._def.values.join('|');
+  }
+  if (shape instanceof z.ZodArray) {
+    return `(${getTypename(shape._def.type)})[]`;
+  }
+  return '';
 }
 
 function coerce(value: any, definition: PermittedZodTypes): unknown {
