@@ -1,0 +1,23 @@
+{
+  "name": "zli",
+  "version": "1.0.0",
+  "description": "A CLI for zod built on modern CLI standards",
+  "main": "index.js",
+  "module": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "change-case": "^5.3.0",
+    "semver": "^7.5.4",
+    "yargs-parser": "^21.1.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.11",
+    "@types/node": "^20.10.5",
+    "@types/semver": "^7.5.6"
+  }
+}
