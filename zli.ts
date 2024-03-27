@@ -636,6 +636,7 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
         int.question('> ', async (input) => {
           if (input.match(/\.exit/i)) {
             int.write('Exiting');
+            int.close();
             isRunning = false;
           } else {
             await this.exec(input);
