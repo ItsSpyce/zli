@@ -39,7 +39,7 @@ describe('zli', () => {
       .command('echo', (cmd) =>
         cmd.describe('Prints a message').invoke(() => {})
       )
-      .exec(['--help']);
+      .exec('--help');
 
     expect(stdout.read()).toMatch(/prints a message/i);
   });
@@ -179,7 +179,7 @@ describe('zli commands', () => {
             stdout.write(`Hello, ${name}!`);
           })
       )
-      .exec(['greet', 'John Doe']);
+      .exec('greet "John Doe"');
 
     expect(mockFn).toHaveBeenCalledWith('John Doe');
     expect(stdout.read()).toMatch(/hello, john doe/i);

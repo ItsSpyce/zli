@@ -2,6 +2,7 @@ const parser = require('yargs-parser');
 import { z } from 'zod';
 import { camelCase, kebabCase } from 'change-case';
 import type { WriteStream } from 'tty';
+import * as readline from 'readline';
 
 const TERMINAL_WIDTH = 80;
 
@@ -243,7 +244,9 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
    * @param args - The command arguments.
    * @returns A promise that resolves when the command execution is complete.
    */
-  exec(args?: string[]): Promise<void>;
+  exec(args?: string | string[]): Promise<void>;
+
+  embed(stdin?: NodeJS.ReadStream): Promise<void>;
 
   /**
    * Displays the help information for the Zli interface.
@@ -545,12 +548,12 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     return this;
   }
 
-  async exec(args?: string[]): Promise<void> {
-    if (typeof args === 'undefined') {
+  async exec(args?: string | string[]): Promise<void> {
+    if (args == null) {
       args = process.argv.slice(2);
     }
     const parsedArgs = camelCaseArgs(parser(args));
-    if (typeof this._formattedArgs === 'undefined') {
+    if (this._formattedArgs == null) {
       this._formattedArgs = parsedArgs;
     } else {
       this._formattedArgs = { ...this._formattedArgs, ...parsedArgs };
@@ -564,8 +567,8 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     );
     if (
       expandedArgs['help'] === true &&
-      typeof runArg === 'undefined' &&
-      typeof this._globalOptions?.help !== 'undefined'
+      runArg == null &&
+      this._globalOptions?.help != null
     ) {
       return this.displayHelp();
     }
@@ -578,11 +581,11 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       this.write(globalOptionsErr.message);
       return;
     }
-    if (typeof this._beforeInvoke !== 'undefined') {
+    if (this._beforeInvoke != null) {
       await this._beforeInvoke(globalOptions);
     }
     const cmd = this._commands.get(runArg);
-    if (typeof cmd !== 'undefined') {
+    if (cmd != null) {
       const args = {
         ...this._formattedArgs,
         ...expandedArgs,
@@ -610,19 +613,37 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
           this.displayHelp();
         }
       }
-    } else if (typeof runArg !== 'undefined') {
+    } else if (runArg != null) {
       this.write(`Command not found: ${runArg}`);
       if (this._meta.showHelpOnNotFound) {
         this.displayHelp();
       }
-    } else if (typeof this._version !== 'undefined') {
+    } else if (this._version != null) {
       this._stdout.write(this._version);
     } else if (this._globalOptions?.help) {
       this.displayHelp();
     }
-    if (typeof this._afterInvoke !== 'undefined') {
+    if (this._afterInvoke != null) {
       this._afterInvoke(globalOptions);
     }
+  }
+
+  embed(stdin: NodeJS.ReadStream = process.stdin) {
+    const int = readline.createInterface(stdin);
+    return new Promise<void>((resolve) => {
+      let isRunning = true;
+      while (isRunning) {
+        int.question('> ', async (input) => {
+          if (input.match(/\.exit/i)) {
+            int.write('Exiting');
+            isRunning = false;
+          } else {
+            await this.exec(input);
+          }
+        });
+      }
+      resolve();
+    });
   }
 }
 
@@ -666,12 +687,12 @@ class _Command<
   private _getSubcommandWithNewArgs(
     args?: ParsedArguments
   ): [_Command<TGlobalOptions, any, any> | undefined, ParsedArguments] {
-    if (typeof args === 'undefined') {
+    if (args == null) {
       return [undefined, args!];
     }
     const [arg] = args._;
     const slicedArgs = { ...args, _: args._.slice(1) };
-    if (typeof arg !== 'undefined' && this._commands.has(arg)) {
+    if (arg != null && this._commands.has(arg)) {
       return [this._commands.get(arg), slicedArgs];
     }
     return [undefined, slicedArgs];
@@ -916,7 +937,7 @@ export type ZliOptions = {
 
 export function zli(opts?: ZliOptions): Zli {
   opts ??= {};
-  if (typeof opts.stdout === 'undefined') {
+  if (opts.stdout == null) {
     opts.stdout = process.stdout;
   }
   return new _Zli(opts.stdout!);
@@ -949,12 +970,12 @@ export function expandShorthandOptions<TOptions extends OptionsShape>(
   args: ParsedArguments,
   shorthands?: Partial<ShorthandDefinitions<TOptions>>
 ): Options<TOptions> {
-  if (typeof shorthands === 'undefined') {
+  if (shorthands == null) {
     return args as any;
   }
   for (const [longhand, shorthand] of Object.entries(shorthands)) {
     const key = shorthand!.substring(1);
-    if (typeof args[key] !== 'undefined') {
+    if (args[key] != null) {
       args[longhand] = args[shorthand!.substring(1)];
       delete args[shorthand!.substring(1)];
     }
@@ -967,7 +988,7 @@ export function parseArguments<TArgs extends ArgumentsShape>(
   args: ParsedArguments,
   schema?: TArgs
 ): Result<Arguments<TArgs>, Error> {
-  if (typeof schema === 'undefined') {
+  if (schema == null) {
     return ok(args as any);
   }
   const parsedArgs = Object.create(null);
@@ -975,8 +996,7 @@ export function parseArguments<TArgs extends ArgumentsShape>(
   const requiredArgsCount = schemaDefinitions.filter(
     ([_, shape]) =>
       !shape.isOptional() ||
-      (shape instanceof z.ZodDefault &&
-        typeof shape._def.defaultValue() !== 'undefined')
+      (shape instanceof z.ZodDefault && shape._def.defaultValue() != null)
   ).length;
   if (args._.length < requiredArgsCount) {
     return err(args as any, incorrectUsageError);
@@ -985,7 +1005,7 @@ export function parseArguments<TArgs extends ArgumentsShape>(
   for (; i < args._.length; i++) {
     const value = args._[i];
     const schema = schemaDefinitions[i];
-    if (typeof schema === 'undefined') {
+    if (schema == null) {
       // we don't try to parse and have no more left, just return what we have
       return parsedArgs;
     }
@@ -1011,7 +1031,7 @@ export function parseOptions<TOptions extends OptionsShape>(
   options: Options<TOptions>, // this is Options because it expects shorthands to be processed
   schema?: TOptions
 ): Result<Options<TOptions>, Error> {
-  if (typeof schema === 'undefined') {
+  if (schema == null) {
     return ok(options);
   }
   const parsedOptions = Object.create(null);
@@ -1059,7 +1079,7 @@ export function parseOptions<TOptions extends OptionsShape>(
 }
 
 export function assertNoRequiredArgsAfterOptional(args?: ArgumentsShape) {
-  if (typeof args === 'undefined') {
+  if (args == null) {
     return;
   }
   let isReadingRequired = true;
@@ -1084,7 +1104,7 @@ export function buildHelpDisplay(
   shorthands?: ShorthandDefinitions<any>
 ): Result<string[]> {
   const lines = new Array<string>();
-  if (typeof args !== 'undefined') {
+  if (args != null) {
     lines.push('Usage:', '');
     const requiredArgs = [];
     const optionalArgs = [];
@@ -1118,11 +1138,11 @@ export function buildHelpDisplay(
     lines.push(name);
   }
 
-  if (typeof description !== 'undefined') {
+  if (description != null) {
     lines.push('\nDescription:', `\t${description}`, '');
   }
 
-  if (typeof options !== 'undefined') {
+  if (options != null) {
     lines.push('Options:');
     for (const [name, shape] of Object.entries(options)) {
       const dashName = kebabCase(name);
@@ -1140,16 +1160,13 @@ export function buildHelpDisplay(
         .map(() => '')
         .join(' ');
       lines.push(`${nameToDisplay}${padding}${typename}`);
-      if (
-        typeof shape.description !== 'undefined' &&
-        !shape.description.match(/undefined/i)
-      ) {
+      if (shape.description != null && !shape.description.match(/undefined/i)) {
         lines.push(`\t${shape.description}`);
       }
     }
     lines.push('');
   }
-  if (typeof commands !== 'undefined') {
+  if (commands != null) {
     for (const [name, command] of commands.entries()) {
       const description = command.getDescription();
       lines.push(name, `\t${description}`);
@@ -1202,7 +1219,7 @@ export function getTypename(shape: PermittedZodTypes): string {
  * @returns The parsed value.
  */
 export function parse(value: any, definition: PermittedZodTypes): unknown {
-  if (typeof value === 'undefined') {
+  if (value == null) {
     if (definition instanceof z.ZodDefault) {
       return definition._def.defaultValue();
     }
@@ -1211,7 +1228,10 @@ export function parse(value: any, definition: PermittedZodTypes): unknown {
   if (typeof value === 'object') {
     return definition?.parse(value) ?? value;
   }
-  const trimmed = String(value).trim();
+  let trimmed = String(value).trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+    trimmed = trimmed.slice(1, -1);
+  }
   const lowered = trimmed.toLowerCase();
   if (!trimmed || String(trimmed).length === 0) {
     return definition.parse('');
@@ -1226,7 +1246,7 @@ export function parse(value: any, definition: PermittedZodTypes): unknown {
     }
   }
   if (definition instanceof z.ZodString) {
-    return definition.parse(String(trimmed));
+    return definition.parse(trimmed);
   }
   if (definition instanceof z.ZodNumber) {
     return definition.parse(parseFloat(trimmed));
