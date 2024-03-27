@@ -1,6 +1,6 @@
 {
   "name": "zli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI for zod built on modern CLI standards",
   "main": "index.js",
   "module": "index.ts",
