@@ -5,7 +5,8 @@
   "main": "index.js",
   "module": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "bun test",
+    "build": "bun build ./index.ts --target node --outfile index.js"
   },
   "author": "",
   "license": "ISC",

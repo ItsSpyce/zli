@@ -1,2202 +1,986 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __toCommonJS = (from) => {
-  const moduleCache = __toCommonJS.moduleCache ??= new WeakMap;
-  var cached = moduleCache.get(from);
-  if (cached)
-    return cached;
-  var to = __defProp({}, "__esModule", { value: true });
-  var desc = { enumerable: false };
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: () => from[key],
-          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
-        });
-  }
-  moduleCache.set(from, to);
-  return to;
-};
-var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, {
-      get: all[name],
-      enumerable: true,
-      configurable: true,
-      set: (newValue) => all[name] = () => newValue
-    });
-};
-var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
-var __require = ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined")
-    return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
+import {createRequire} from "node:module";
+var __require = createRequire(import.meta.url);
 
-// node:util
-var exports_util = {};
-__export(exports_util, {
-  default: () => {
-    {
-      return so;
-    }
-  },
-  TextEncoder: () => {
-    {
-      return st;
-    }
-  },
-  TextDecoder: () => {
-    {
-      return ct;
-    }
-  }
-});
-var pt, dr, lt, gt, dt, bt, p, At, gr, F, mt, br, N, Zr, Kr, V, re, H, ce, Y, Ae, Se, Pe, Fr, Br, Ur, Rr, qe, rt, tt, nt, yt, E, st, ct, so;
-var init_util = __esm(() => {
-  pt = Object.create;
-  dr = Object.defineProperty;
-  lt = Object.getOwnPropertyDescriptor;
-  gt = Object.getOwnPropertyNames;
-  dt = Object.getPrototypeOf;
-  bt = Object.prototype.hasOwnProperty;
-  p = (r, e) => () => (e || r((e = { exports: {} }).exports, e), e.exports);
-  At = (r, e) => {
-    for (var t in e)
-      dr(r, t, { get: e[t], enumerable: true });
-  };
-  gr = (r, e, t, n) => {
-    if (e && typeof e == "object" || typeof e == "function")
-      for (let o of gt(e))
-        !bt.call(r, o) && o !== t && dr(r, o, { get: () => e[o], enumerable: !(n = lt(e, o)) || n.enumerable });
-    return r;
-  };
-  F = (r, e, t) => (gr(r, e, "default"), t && gr(t, e, "default"));
-  mt = (r, e, t) => (t = r != null ? pt(dt(r)) : {}, gr(e || !r || !r.__esModule ? dr(t, "default", { value: r, enumerable: true }) : t, r));
-  br = p((po, Vr) => {
-    Vr.exports = function() {
-      if (typeof Symbol != "function" || typeof Object.getOwnPropertySymbols != "function")
-        return false;
-      if (typeof Symbol.iterator == "symbol")
-        return true;
-      var e = {}, t = Symbol("test"), n = Object(t);
-      if (typeof t == "string" || Object.prototype.toString.call(t) !== "[object Symbol]" || Object.prototype.toString.call(n) !== "[object Symbol]")
-        return false;
-      var o = 42;
-      e[t] = o;
-      for (t in e)
-        return false;
-      if (typeof Object.keys == "function" && Object.keys(e).length !== 0 || typeof Object.getOwnPropertyNames == "function" && Object.getOwnPropertyNames(e).length !== 0)
-        return false;
-      var i = Object.getOwnPropertySymbols(e);
-      if (i.length !== 1 || i[0] !== t || !Object.prototype.propertyIsEnumerable.call(e, t))
-        return false;
-      if (typeof Object.getOwnPropertyDescriptor == "function") {
-        var a = Object.getOwnPropertyDescriptor(e, t);
-        if (a.value !== o || a.enumerable !== true)
-          return false;
-      }
-      return true;
-    };
-  });
-  N = p((lo, Jr) => {
-    var ht = br();
-    Jr.exports = function() {
-      return ht() && !!Symbol.toStringTag;
-    };
-  });
-  Zr = p((go, Hr) => {
-    var Lr = typeof Symbol < "u" && Symbol, St = br();
-    Hr.exports = function() {
-      return typeof Lr != "function" || typeof Symbol != "function" || typeof Lr("foo") != "symbol" || typeof Symbol("bar") != "symbol" ? false : St();
-    };
-  });
-  Kr = p((bo, Yr) => {
-    var vt = "Function.prototype.bind called on incompatible ", Ar = Array.prototype.slice, Ot = Object.prototype.toString, jt = "[object Function]";
-    Yr.exports = function(e) {
-      var t = this;
-      if (typeof t != "function" || Ot.call(t) !== jt)
-        throw new TypeError(vt + t);
-      for (var n = Ar.call(arguments, 1), o, i = function() {
-        if (this instanceof o) {
-          var g = t.apply(this, n.concat(Ar.call(arguments)));
-          return Object(g) === g ? g : this;
-        } else
-          return t.apply(e, n.concat(Ar.call(arguments)));
-      }, a = Math.max(0, t.length - n.length), f = [], c = 0;c < a; c++)
-        f.push("$" + c);
-      if (o = Function("binder", "return function (" + f.join(",") + "){ return binder.apply(this,arguments); }")(i), t.prototype) {
-        var l = function() {
-        };
-        l.prototype = t.prototype, o.prototype = new l, l.prototype = null;
-      }
-      return o;
-    };
-  });
-  V = p((Ao, Qr) => {
-    var Pt = Kr();
-    Qr.exports = Function.prototype.bind || Pt;
-  });
-  re = p((mo, Xr) => {
-    var wt = V();
-    Xr.exports = wt.call(Function.call, Object.prototype.hasOwnProperty);
-  });
-  H = p((ho, ie) => {
-    var s, x = SyntaxError, oe = Function, U = TypeError, mr = function(r) {
-      try {
-        return oe('"use strict"; return (' + r + ").constructor;")();
-      } catch {
-      }
-    }, v = Object.getOwnPropertyDescriptor;
-    if (v)
-      try {
-        v({}, "");
-      } catch {
-        v = null;
-      }
-    var hr = function() {
-      throw new U;
-    }, Et = v ? function() {
-      try {
-        return arguments.callee, hr;
-      } catch {
-        try {
-          return v(arguments, "callee").get;
-        } catch {
-          return hr;
-        }
-      }
-    }() : hr, I = Zr()(), m = Object.getPrototypeOf || function(r) {
-      return r.__proto__;
-    }, B = {}, Tt = typeof Uint8Array > "u" ? s : m(Uint8Array), O = { "%AggregateError%": typeof AggregateError > "u" ? s : AggregateError, "%Array%": Array, "%ArrayBuffer%": typeof ArrayBuffer > "u" ? s : ArrayBuffer, "%ArrayIteratorPrototype%": I ? m([][Symbol.iterator]()) : s, "%AsyncFromSyncIteratorPrototype%": s, "%AsyncFunction%": B, "%AsyncGenerator%": B, "%AsyncGeneratorFunction%": B, "%AsyncIteratorPrototype%": B, "%Atomics%": typeof Atomics > "u" ? s : Atomics, "%BigInt%": typeof BigInt > "u" ? s : BigInt, "%BigInt64Array%": typeof BigInt64Array > "u" ? s : BigInt64Array, "%BigUint64Array%": typeof BigUint64Array > "u" ? s : BigUint64Array, "%Boolean%": Boolean, "%DataView%": typeof DataView > "u" ? s : DataView, "%Date%": Date, "%decodeURI%": decodeURI, "%decodeURIComponent%": decodeURIComponent, "%encodeURI%": encodeURI, "%encodeURIComponent%": encodeURIComponent, "%Error%": Error, "%eval%": eval, "%EvalError%": EvalError, "%Float32Array%": typeof Float32Array > "u" ? s : Float32Array, "%Float64Array%": typeof Float64Array > "u" ? s : Float64Array, "%FinalizationRegistry%": typeof FinalizationRegistry > "u" ? s : FinalizationRegistry, "%Function%": oe, "%GeneratorFunction%": B, "%Int8Array%": typeof Int8Array > "u" ? s : Int8Array, "%Int16Array%": typeof Int16Array > "u" ? s : Int16Array, "%Int32Array%": typeof Int32Array > "u" ? s : Int32Array, "%isFinite%": isFinite, "%isNaN%": isNaN, "%IteratorPrototype%": I ? m(m([][Symbol.iterator]())) : s, "%JSON%": typeof JSON == "object" ? JSON : s, "%Map%": typeof Map > "u" ? s : Map, "%MapIteratorPrototype%": typeof Map > "u" || !I ? s : m(new Map()[Symbol.iterator]()), "%Math%": Math, "%Number%": Number, "%Object%": Object, "%parseFloat%": parseFloat, "%parseInt%": parseInt, "%Promise%": typeof Promise > "u" ? s : Promise, "%Proxy%": typeof Proxy > "u" ? s : Proxy, "%RangeError%": RangeError, "%ReferenceError%": ReferenceError, "%Reflect%": typeof Reflect > "u" ? s : Reflect, "%RegExp%": RegExp, "%Set%": typeof Set > "u" ? s : Set, "%SetIteratorPrototype%": typeof Set > "u" || !I ? s : m(new Set()[Symbol.iterator]()), "%SharedArrayBuffer%": typeof SharedArrayBuffer > "u" ? s : SharedArrayBuffer, "%String%": String, "%StringIteratorPrototype%": I ? m(""[Symbol.iterator]()) : s, "%Symbol%": I ? Symbol : s, "%SyntaxError%": x, "%ThrowTypeError%": Et, "%TypedArray%": Tt, "%TypeError%": U, "%Uint8Array%": typeof Uint8Array > "u" ? s : Uint8Array, "%Uint8ClampedArray%": typeof Uint8ClampedArray > "u" ? s : Uint8ClampedArray, "%Uint16Array%": typeof Uint16Array > "u" ? s : Uint16Array, "%Uint32Array%": typeof Uint32Array > "u" ? s : Uint32Array, "%URIError%": URIError, "%WeakMap%": typeof WeakMap > "u" ? s : WeakMap, "%WeakRef%": typeof WeakRef > "u" ? s : WeakRef, "%WeakSet%": typeof WeakSet > "u" ? s : WeakSet };
-    try {
-      null.error;
-    } catch (r) {
-      ee = m(m(r)), O["%Error.prototype%"] = ee;
-    }
-    var ee, Ft = function r(e) {
-      var t;
-      if (e === "%AsyncFunction%")
-        t = mr("async function () {}");
-      else if (e === "%GeneratorFunction%")
-        t = mr("function* () {}");
-      else if (e === "%AsyncGeneratorFunction%")
-        t = mr("async function* () {}");
-      else if (e === "%AsyncGenerator%") {
-        var n = r("%AsyncGeneratorFunction%");
-        n && (t = n.prototype);
-      } else if (e === "%AsyncIteratorPrototype%") {
-        var o = r("%AsyncGenerator%");
-        o && (t = m(o.prototype));
-      }
-      return O[e] = t, t;
-    }, te = { "%ArrayBufferPrototype%": ["ArrayBuffer", "prototype"], "%ArrayPrototype%": ["Array", "prototype"], "%ArrayProto_entries%": ["Array", "prototype", "entries"], "%ArrayProto_forEach%": ["Array", "prototype", "forEach"], "%ArrayProto_keys%": ["Array", "prototype", "keys"], "%ArrayProto_values%": ["Array", "prototype", "values"], "%AsyncFunctionPrototype%": ["AsyncFunction", "prototype"], "%AsyncGenerator%": ["AsyncGeneratorFunction", "prototype"], "%AsyncGeneratorPrototype%": ["AsyncGeneratorFunction", "prototype", "prototype"], "%BooleanPrototype%": ["Boolean", "prototype"], "%DataViewPrototype%": ["DataView", "prototype"], "%DatePrototype%": ["Date", "prototype"], "%ErrorPrototype%": ["Error", "prototype"], "%EvalErrorPrototype%": ["EvalError", "prototype"], "%Float32ArrayPrototype%": ["Float32Array", "prototype"], "%Float64ArrayPrototype%": ["Float64Array", "prototype"], "%FunctionPrototype%": ["Function", "prototype"], "%Generator%": ["GeneratorFunction", "prototype"], "%GeneratorPrototype%": ["GeneratorFunction", "prototype", "prototype"], "%Int8ArrayPrototype%": ["Int8Array", "prototype"], "%Int16ArrayPrototype%": ["Int16Array", "prototype"], "%Int32ArrayPrototype%": ["Int32Array", "prototype"], "%JSONParse%": ["JSON", "parse"], "%JSONStringify%": ["JSON", "stringify"], "%MapPrototype%": ["Map", "prototype"], "%NumberPrototype%": ["Number", "prototype"], "%ObjectPrototype%": ["Object", "prototype"], "%ObjProto_toString%": ["Object", "prototype", "toString"], "%ObjProto_valueOf%": ["Object", "prototype", "valueOf"], "%PromisePrototype%": ["Promise", "prototype"], "%PromiseProto_then%": ["Promise", "prototype", "then"], "%Promise_all%": ["Promise", "all"], "%Promise_reject%": ["Promise", "reject"], "%Promise_resolve%": ["Promise", "resolve"], "%RangeErrorPrototype%": ["RangeError", "prototype"], "%ReferenceErrorPrototype%": ["ReferenceError", "prototype"], "%RegExpPrototype%": ["RegExp", "prototype"], "%SetPrototype%": ["Set", "prototype"], "%SharedArrayBufferPrototype%": ["SharedArrayBuffer", "prototype"], "%StringPrototype%": ["String", "prototype"], "%SymbolPrototype%": ["Symbol", "prototype"], "%SyntaxErrorPrototype%": ["SyntaxError", "prototype"], "%TypedArrayPrototype%": ["TypedArray", "prototype"], "%TypeErrorPrototype%": ["TypeError", "prototype"], "%Uint8ArrayPrototype%": ["Uint8Array", "prototype"], "%Uint8ClampedArrayPrototype%": ["Uint8ClampedArray", "prototype"], "%Uint16ArrayPrototype%": ["Uint16Array", "prototype"], "%Uint32ArrayPrototype%": ["Uint32Array", "prototype"], "%URIErrorPrototype%": ["URIError", "prototype"], "%WeakMapPrototype%": ["WeakMap", "prototype"], "%WeakSetPrototype%": ["WeakSet", "prototype"] }, C = V(), J = re(), It = C.call(Function.call, Array.prototype.concat), Bt = C.call(Function.apply, Array.prototype.splice), ne = C.call(Function.call, String.prototype.replace), L = C.call(Function.call, String.prototype.slice), Ut = C.call(Function.call, RegExp.prototype.exec), xt = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g, Dt = /\\(\\)?/g, Rt = function(e) {
-      var t = L(e, 0, 1), n = L(e, -1);
-      if (t === "%" && n !== "%")
-        throw new x("invalid intrinsic syntax, expected closing `%`");
-      if (n === "%" && t !== "%")
-        throw new x("invalid intrinsic syntax, expected opening `%`");
-      var o = [];
-      return ne(e, xt, function(i, a, f, c) {
-        o[o.length] = f ? ne(c, Dt, "$1") : a || i;
-      }), o;
-    }, kt = function(e, t) {
-      var n = e, o;
-      if (J(te, n) && (o = te[n], n = "%" + o[0] + "%"), J(O, n)) {
-        var i = O[n];
-        if (i === B && (i = Ft(n)), typeof i > "u" && !t)
-          throw new U("intrinsic " + e + " exists, but is not available. Please file an issue!");
-        return { alias: o, name: n, value: i };
-      }
-      throw new x("intrinsic " + e + " does not exist!");
-    };
-    ie.exports = function(e, t) {
-      if (typeof e != "string" || e.length === 0)
-        throw new U("intrinsic name must be a non-empty string");
-      if (arguments.length > 1 && typeof t != "boolean")
-        throw new U('"allowMissing" argument must be a boolean');
-      if (Ut(/^%?[^%]*%?$/, e) === null)
-        throw new x("`%` may not be present anywhere but at the beginning and end of the intrinsic name");
-      var n = Rt(e), o = n.length > 0 ? n[0] : "", i = kt("%" + o + "%", t), a = i.name, f = i.value, c = false, l = i.alias;
-      l && (o = l[0], Bt(n, It([0, 1], l)));
-      for (var g = 1, S = true;g < n.length; g += 1) {
-        var d = n[g], T = L(d, 0, 1), _ = L(d, -1);
-        if ((T === '"' || T === "'" || T === "`" || _ === '"' || _ === "'" || _ === "`") && T !== _)
-          throw new x("property names with quotes must have matching quotes");
-        if ((d === "constructor" || !S) && (c = true), o += "." + d, a = "%" + o + "%", J(O, a))
-          f = O[a];
-        else if (f != null) {
-          if (!(d in f)) {
-            if (!t)
-              throw new U("base intrinsic for " + e + " exists, but the property is not available.");
-            return;
-          }
-          if (v && g + 1 >= n.length) {
-            var z2 = v(f, d);
-            S = !!z2, S && "get" in z2 && !("originalValue" in z2.get) ? f = z2.get : f = f[d];
-          } else
-            S = J(f, d), f = f[d];
-          S && !c && (O[a] = f);
-        }
-      }
-      return f;
-    };
-  });
-  ce = p((So, Z) => {
-    var Sr = V(), D = H(), ue = D("%Function.prototype.apply%"), ye = D("%Function.prototype.call%"), se = D("%Reflect.apply%", true) || Sr.call(ye, ue), ae = D("%Object.getOwnPropertyDescriptor%", true), j = D("%Object.defineProperty%", true), Mt = D("%Math.max%");
-    if (j)
-      try {
-        j({}, "a", { value: 1 });
-      } catch {
-        j = null;
-      }
-    Z.exports = function(e) {
-      var t = se(Sr, ye, arguments);
-      if (ae && j) {
-        var n = ae(t, "length");
-        n.configurable && j(t, "length", { value: 1 + Mt(0, e.length - (arguments.length - 1)) });
-      }
-      return t;
-    };
-    var fe = function() {
-      return se(Sr, ue, arguments);
-    };
-    j ? j(Z.exports, "apply", { value: fe }) : Z.exports.apply = fe;
-  });
-  Y = p((vo, ge) => {
-    var pe = H(), le = ce(), Nt = le(pe("String.prototype.indexOf"));
-    ge.exports = function(e, t) {
-      var n = pe(e, !!t);
-      return typeof n == "function" && Nt(e, ".prototype.") > -1 ? le(n) : n;
-    };
-  });
-  Ae = p((Oo, be) => {
-    var Ct = N()(), $t = Y(), vr = $t("Object.prototype.toString"), K = function(e) {
-      return Ct && e && typeof e == "object" && Symbol.toStringTag in e ? false : vr(e) === "[object Arguments]";
-    }, de = function(e) {
-      return K(e) ? true : e !== null && typeof e == "object" && typeof e.length == "number" && e.length >= 0 && vr(e) !== "[object Array]" && vr(e.callee) === "[object Function]";
-    }, qt = function() {
-      return K(arguments);
-    }();
-    K.isLegacyArguments = de;
-    be.exports = qt ? K : de;
-  });
-  Se = p((jo, he) => {
-    var Gt = Object.prototype.toString, Wt = Function.prototype.toString, _t = /^\s*(?:function)?\*/, me = N()(), Or = Object.getPrototypeOf, zt = function() {
-      if (!me)
-        return false;
-      try {
-        return Function("return function*() {}")();
-      } catch {
-      }
-    }, jr;
-    he.exports = function(e) {
-      if (typeof e != "function")
-        return false;
-      if (_t.test(Wt.call(e)))
-        return true;
-      if (!me) {
-        var t = Gt.call(e);
-        return t === "[object GeneratorFunction]";
-      }
-      if (!Or)
-        return false;
-      if (typeof jr > "u") {
-        var n = zt();
-        jr = n ? Or(n) : false;
-      }
-      return Or(e) === jr;
-    };
-  });
-  Pe = p((Po, je) => {
-    var Oe = Function.prototype.toString, R = typeof Reflect == "object" && Reflect !== null && Reflect.apply, wr, Q;
-    if (typeof R == "function" && typeof Object.defineProperty == "function")
-      try {
-        wr = Object.defineProperty({}, "length", { get: function() {
-          throw Q;
-        } }), Q = {}, R(function() {
-          throw 42;
-        }, null, wr);
-      } catch (r) {
-        r !== Q && (R = null);
-      }
-    else
-      R = null;
-    var Vt = /^\s*class\b/, Er = function(e) {
-      try {
-        var t = Oe.call(e);
-        return Vt.test(t);
-      } catch {
-        return false;
-      }
-    }, Pr = function(e) {
-      try {
-        return Er(e) ? false : (Oe.call(e), true);
-      } catch {
-        return false;
-      }
-    }, X = Object.prototype.toString, Jt = "[object Object]", Lt = "[object Function]", Ht = "[object GeneratorFunction]", Zt = "[object HTMLAllCollection]", Yt = "[object HTML document.all class]", Kt = "[object HTMLCollection]", Qt = typeof Symbol == "function" && !!Symbol.toStringTag, Xt = !(0 in [,]), Tr = function() {
-      return false;
-    };
-    typeof document == "object" && (ve = document.all, X.call(ve) === X.call(document.all) && (Tr = function(e) {
-      if ((Xt || !e) && (typeof e > "u" || typeof e == "object"))
-        try {
-          var t = X.call(e);
-          return (t === Zt || t === Yt || t === Kt || t === Jt) && e("") == null;
-        } catch {
-        }
-      return false;
-    }));
-    var ve;
-    je.exports = R ? function(e) {
-      if (Tr(e))
-        return true;
-      if (!e || typeof e != "function" && typeof e != "object")
-        return false;
-      try {
-        R(e, null, wr);
-      } catch (t) {
-        if (t !== Q)
-          return false;
-      }
-      return !Er(e) && Pr(e);
-    } : function(e) {
-      if (Tr(e))
-        return true;
-      if (!e || typeof e != "function" && typeof e != "object")
-        return false;
-      if (Qt)
-        return Pr(e);
-      if (Er(e))
-        return false;
-      var t = X.call(e);
-      return t !== Lt && t !== Ht && !/^\[object HTML/.test(t) ? false : Pr(e);
-    };
-  });
-  Fr = p((wo, Ee) => {
-    var rn = Pe(), en = Object.prototype.toString, we = Object.prototype.hasOwnProperty, tn = function(e, t, n) {
-      for (var o = 0, i = e.length;o < i; o++)
-        we.call(e, o) && (n == null ? t(e[o], o, e) : t.call(n, e[o], o, e));
-    }, nn = function(e, t, n) {
-      for (var o = 0, i = e.length;o < i; o++)
-        n == null ? t(e.charAt(o), o, e) : t.call(n, e.charAt(o), o, e);
-    }, on = function(e, t, n) {
-      for (var o in e)
-        we.call(e, o) && (n == null ? t(e[o], o, e) : t.call(n, e[o], o, e));
-    }, an = function(e, t, n) {
-      if (!rn(t))
-        throw new TypeError("iterator must be a function");
-      var o;
-      arguments.length >= 3 && (o = n), en.call(e) === "[object Array]" ? tn(e, t, o) : typeof e == "string" ? nn(e, t, o) : on(e, t, o);
-    };
-    Ee.exports = an;
-  });
-  Br = p((Eo, Te) => {
-    var Ir = ["BigInt64Array", "BigUint64Array", "Float32Array", "Float64Array", "Int16Array", "Int32Array", "Int8Array", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray"], fn = typeof globalThis > "u" ? global : globalThis;
-    Te.exports = function() {
-      for (var e = [], t = 0;t < Ir.length; t++)
-        typeof fn[Ir[t]] == "function" && (e[e.length] = Ir[t]);
-      return e;
-    };
-  });
-  Ur = p((To, Fe) => {
-    var un = H(), rr = un("%Object.getOwnPropertyDescriptor%", true);
-    if (rr)
-      try {
-        rr([], "length");
-      } catch {
-        rr = null;
-      }
-    Fe.exports = rr;
-  });
-  Rr = p((Fo, De) => {
-    var Ie = Fr(), yn = Br(), Dr = Y(), sn = Dr("Object.prototype.toString"), Be = N()(), er = Ur(), cn = typeof globalThis > "u" ? global : globalThis, Ue = yn(), pn = Dr("Array.prototype.indexOf", true) || function(e, t) {
-      for (var n = 0;n < e.length; n += 1)
-        if (e[n] === t)
-          return n;
-      return -1;
-    }, ln = Dr("String.prototype.slice"), xe = {}, xr = Object.getPrototypeOf;
-    Be && er && xr && Ie(Ue, function(r) {
-      var e = new cn[r];
-      if (Symbol.toStringTag in e) {
-        var t = xr(e), n = er(t, Symbol.toStringTag);
-        if (!n) {
-          var o = xr(t);
-          n = er(o, Symbol.toStringTag);
-        }
-        xe[r] = n.get;
-      }
-    });
-    var gn = function(e) {
-      var t = false;
-      return Ie(xe, function(n, o) {
-        if (!t)
-          try {
-            t = n.call(e) === o;
-          } catch {
-          }
-      }), t;
-    };
-    De.exports = function(e) {
-      if (!e || typeof e != "object")
-        return false;
-      if (!Be || !(Symbol.toStringTag in e)) {
-        var t = ln(sn(e), 8, -1);
-        return pn(Ue, t) > -1;
-      }
-      return er ? gn(e) : false;
-    };
-  });
-  qe = p((Io, $e) => {
-    var ke = Fr(), dn = Br(), Me = Y(), kr = Ur(), bn = Me("Object.prototype.toString"), Ne = N()(), Re = typeof globalThis > "u" ? global : globalThis, An = dn(), mn = Me("String.prototype.slice"), Ce = {}, Mr = Object.getPrototypeOf;
-    Ne && kr && Mr && ke(An, function(r) {
-      if (typeof Re[r] == "function") {
-        var e = new Re[r];
-        if (Symbol.toStringTag in e) {
-          var t = Mr(e), n = kr(t, Symbol.toStringTag);
-          if (!n) {
-            var o = Mr(t);
-            n = kr(o, Symbol.toStringTag);
-          }
-          Ce[r] = n.get;
-        }
-      }
-    });
-    var hn = function(e) {
-      var t = false;
-      return ke(Ce, function(n, o) {
-        if (!t)
-          try {
-            var i = n.call(e);
-            i === o && (t = i);
-          } catch {
-          }
-      }), t;
-    }, Sn = Rr();
-    $e.exports = function(e) {
-      return Sn(e) ? !Ne || !(Symbol.toStringTag in e) ? mn(bn(e), 8, -1) : hn(e) : false;
-    };
-  });
-  rt = p((u) => {
-    var vn = Ae(), On = Se(), A = qe(), Ge = Rr();
-    function k(r) {
-      return r.call.bind(r);
-    }
-    var We = typeof BigInt < "u", _e = typeof Symbol < "u", b = k(Object.prototype.toString), jn = k(Number.prototype.valueOf), Pn = k(String.prototype.valueOf), wn = k(Boolean.prototype.valueOf);
-    We && (ze = k(BigInt.prototype.valueOf));
-    var ze;
-    _e && (Ve = k(Symbol.prototype.valueOf));
-    var Ve;
-    function q(r, e) {
-      if (typeof r != "object")
-        return false;
-      try {
-        return e(r), true;
-      } catch {
-        return false;
-      }
-    }
-    u.isArgumentsObject = vn;
-    u.isGeneratorFunction = On;
-    u.isTypedArray = Ge;
-    function En(r) {
-      return typeof Promise < "u" && r instanceof Promise || r !== null && typeof r == "object" && typeof r.then == "function" && typeof r.catch == "function";
-    }
-    u.isPromise = En;
-    function Tn(r) {
-      return typeof ArrayBuffer < "u" && ArrayBuffer.isView ? ArrayBuffer.isView(r) : Ge(r) || Le(r);
-    }
-    u.isArrayBufferView = Tn;
-    function Fn(r) {
-      return A(r) === "Uint8Array";
-    }
-    u.isUint8Array = Fn;
-    function In(r) {
-      return A(r) === "Uint8ClampedArray";
-    }
-    u.isUint8ClampedArray = In;
-    function Bn(r) {
-      return A(r) === "Uint16Array";
-    }
-    u.isUint16Array = Bn;
-    function Un(r) {
-      return A(r) === "Uint32Array";
-    }
-    u.isUint32Array = Un;
-    function xn(r) {
-      return A(r) === "Int8Array";
-    }
-    u.isInt8Array = xn;
-    function Dn(r) {
-      return A(r) === "Int16Array";
-    }
-    u.isInt16Array = Dn;
-    function Rn(r) {
-      return A(r) === "Int32Array";
-    }
-    u.isInt32Array = Rn;
-    function kn(r) {
-      return A(r) === "Float32Array";
-    }
-    u.isFloat32Array = kn;
-    function Mn(r) {
-      return A(r) === "Float64Array";
-    }
-    u.isFloat64Array = Mn;
-    function Nn(r) {
-      return A(r) === "BigInt64Array";
-    }
-    u.isBigInt64Array = Nn;
-    function Cn(r) {
-      return A(r) === "BigUint64Array";
-    }
-    u.isBigUint64Array = Cn;
-    function tr(r) {
-      return b(r) === "[object Map]";
-    }
-    tr.working = typeof Map < "u" && tr(new Map);
-    function $n(r) {
-      return typeof Map > "u" ? false : tr.working ? tr(r) : r instanceof Map;
-    }
-    u.isMap = $n;
-    function nr(r) {
-      return b(r) === "[object Set]";
-    }
-    nr.working = typeof Set < "u" && nr(new Set);
-    function qn(r) {
-      return typeof Set > "u" ? false : nr.working ? nr(r) : r instanceof Set;
-    }
-    u.isSet = qn;
-    function or(r) {
-      return b(r) === "[object WeakMap]";
-    }
-    or.working = typeof WeakMap < "u" && or(new WeakMap);
-    function Gn(r) {
-      return typeof WeakMap > "u" ? false : or.working ? or(r) : r instanceof WeakMap;
-    }
-    u.isWeakMap = Gn;
-    function Cr(r) {
-      return b(r) === "[object WeakSet]";
-    }
-    Cr.working = typeof WeakSet < "u" && Cr(new WeakSet);
-    function Wn(r) {
-      return Cr(r);
-    }
-    u.isWeakSet = Wn;
-    function ir(r) {
-      return b(r) === "[object ArrayBuffer]";
-    }
-    ir.working = typeof ArrayBuffer < "u" && ir(new ArrayBuffer);
-    function Je(r) {
-      return typeof ArrayBuffer > "u" ? false : ir.working ? ir(r) : r instanceof ArrayBuffer;
-    }
-    u.isArrayBuffer = Je;
-    function ar(r) {
-      return b(r) === "[object DataView]";
-    }
-    ar.working = typeof ArrayBuffer < "u" && typeof DataView < "u" && ar(new DataView(new ArrayBuffer(1), 0, 1));
-    function Le(r) {
-      return typeof DataView > "u" ? false : ar.working ? ar(r) : r instanceof DataView;
-    }
-    u.isDataView = Le;
-    var Nr = typeof SharedArrayBuffer < "u" ? SharedArrayBuffer : undefined;
-    function $(r) {
-      return b(r) === "[object SharedArrayBuffer]";
-    }
-    function He(r) {
-      return typeof Nr > "u" ? false : (typeof $.working > "u" && ($.working = $(new Nr)), $.working ? $(r) : r instanceof Nr);
-    }
-    u.isSharedArrayBuffer = He;
-    function _n(r) {
-      return b(r) === "[object AsyncFunction]";
-    }
-    u.isAsyncFunction = _n;
-    function zn(r) {
-      return b(r) === "[object Map Iterator]";
-    }
-    u.isMapIterator = zn;
-    function Vn(r) {
-      return b(r) === "[object Set Iterator]";
-    }
-    u.isSetIterator = Vn;
-    function Jn(r) {
-      return b(r) === "[object Generator]";
-    }
-    u.isGeneratorObject = Jn;
-    function Ln(r) {
-      return b(r) === "[object WebAssembly.Module]";
-    }
-    u.isWebAssemblyCompiledModule = Ln;
-    function Ze(r) {
-      return q(r, jn);
-    }
-    u.isNumberObject = Ze;
-    function Ye(r) {
-      return q(r, Pn);
-    }
-    u.isStringObject = Ye;
-    function Ke(r) {
-      return q(r, wn);
-    }
-    u.isBooleanObject = Ke;
-    function Qe(r) {
-      return We && q(r, ze);
-    }
-    u.isBigIntObject = Qe;
-    function Xe(r) {
-      return _e && q(r, Ve);
-    }
-    u.isSymbolObject = Xe;
-    function Hn(r) {
-      return Ze(r) || Ye(r) || Ke(r) || Qe(r) || Xe(r);
-    }
-    u.isBoxedPrimitive = Hn;
-    function Zn(r) {
-      return typeof Uint8Array < "u" && (Je(r) || He(r));
-    }
-    u.isAnyArrayBuffer = Zn;
-    ["isProxy", "isExternal", "isModuleNamespaceObject"].forEach(function(r) {
-      Object.defineProperty(u, r, { enumerable: false, value: function() {
-        throw new Error(r + " is not supported in userland");
-      } });
-    });
-  });
-  tt = p((Uo, et) => {
-    et.exports = function(e) {
-      return e && typeof e == "object" && typeof e.copy == "function" && typeof e.fill == "function" && typeof e.readUInt8 == "function";
-    };
-  });
-  nt = p((xo, $r) => {
-    typeof Object.create == "function" ? $r.exports = function(e, t) {
-      t && (e.super_ = t, e.prototype = Object.create(t.prototype, { constructor: { value: e, enumerable: false, writable: true, configurable: true } }));
-    } : $r.exports = function(e, t) {
-      if (t) {
-        e.super_ = t;
-        var n = function() {
-        };
-        n.prototype = t.prototype, e.prototype = new n, e.prototype.constructor = e;
-      }
-    };
-  });
-  yt = p((y) => {
-    var ot = Object.getOwnPropertyDescriptors || function(e) {
-      for (var t = Object.keys(e), n = {}, o = 0;o < t.length; o++)
-        n[t[o]] = Object.getOwnPropertyDescriptor(e, t[o]);
-      return n;
-    }, Yn = /%[sdj%]/g;
-    y.format = function(r) {
-      if (!lr(r)) {
-        for (var e = [], t = 0;t < arguments.length; t++)
-          e.push(h(arguments[t]));
-        return e.join(" ");
-      }
-      for (var t = 1, n = arguments, o = n.length, i = String(r).replace(Yn, function(f) {
-        if (f === "%%")
-          return "%";
-        if (t >= o)
-          return f;
-        switch (f) {
-          case "%s":
-            return String(n[t++]);
-          case "%d":
-            return Number(n[t++]);
-          case "%j":
-            try {
-              return JSON.stringify(n[t++]);
-            } catch {
-              return "[Circular]";
-            }
-          default:
-            return f;
-        }
-      }), a = n[t];t < o; a = n[++t])
-        pr(a) || !M(a) ? i += " " + a : i += " " + h(a);
-      return i;
-    };
-    y.deprecate = function(r, e) {
-      if (typeof process < "u" && process.noDeprecation === true)
-        return r;
-      if (typeof process > "u")
-        return function() {
-          return y.deprecate(r, e).apply(this, arguments);
-        };
-      var t = false;
-      function n() {
-        if (!t) {
-          if (process.throwDeprecation)
-            throw new Error(e);
-          process.traceDeprecation ? console.trace(e) : console.error(e), t = true;
-        }
-        return r.apply(this, arguments);
-      }
-      return n;
-    };
-    var fr = {}, it = /^$/;
-    process.env.NODE_DEBUG && (ur = process.env.NODE_DEBUG, ur = ur.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*").replace(/,/g, "$|^").toUpperCase(), it = new RegExp("^" + ur + "$", "i"));
-    var ur;
-    y.debuglog = function(r) {
-      if (r = r.toUpperCase(), !fr[r])
-        if (it.test(r)) {
-          var e = process.pid;
-          fr[r] = function() {
-            var t = y.format.apply(y, arguments);
-            console.error("%s %d: %s", r, e, t);
-          };
-        } else
-          fr[r] = function() {
-          };
-      return fr[r];
-    };
-    function h(r, e) {
-      var t = { seen: [], stylize: Qn };
-      return arguments.length >= 3 && (t.depth = arguments[2]), arguments.length >= 4 && (t.colors = arguments[3]), _r(e) ? t.showHidden = e : e && y._extend(t, e), w(t.showHidden) && (t.showHidden = false), w(t.depth) && (t.depth = 2), w(t.colors) && (t.colors = false), w(t.customInspect) && (t.customInspect = true), t.colors && (t.stylize = Kn), sr(t, r, t.depth);
-    }
-    y.inspect = h;
-    h.colors = { bold: [1, 22], italic: [3, 23], underline: [4, 24], inverse: [7, 27], white: [37, 39], grey: [90, 39], black: [30, 39], blue: [34, 39], cyan: [36, 39], green: [32, 39], magenta: [35, 39], red: [31, 39], yellow: [33, 39] };
-    h.styles = { special: "cyan", number: "yellow", boolean: "yellow", undefined: "grey", null: "bold", string: "green", date: "magenta", regexp: "red" };
-    function Kn(r, e) {
-      var t = h.styles[e];
-      return t ? "\x1B[" + h.colors[t][0] + "m" + r + "\x1B[" + h.colors[t][1] + "m" : r;
-    }
-    function Qn(r, e) {
-      return r;
-    }
-    function Xn(r) {
-      var e = {};
-      return r.forEach(function(t, n) {
-        e[t] = true;
-      }), e;
-    }
-    function sr(r, e, t) {
-      if (r.customInspect && e && yr(e.inspect) && e.inspect !== y.inspect && !(e.constructor && e.constructor.prototype === e)) {
-        var n = e.inspect(t, r);
-        return lr(n) || (n = sr(r, n, t)), n;
-      }
-      var o = ro(r, e);
-      if (o)
-        return o;
-      var i = Object.keys(e), a = Xn(i);
-      if (r.showHidden && (i = Object.getOwnPropertyNames(e)), W(e) && (i.indexOf("message") >= 0 || i.indexOf("description") >= 0))
-        return qr(e);
-      if (i.length === 0) {
-        if (yr(e)) {
-          var f = e.name ? ": " + e.name : "";
-          return r.stylize("[Function" + f + "]", "special");
-        }
-        if (G(e))
-          return r.stylize(RegExp.prototype.toString.call(e), "regexp");
-        if (cr(e))
-          return r.stylize(Date.prototype.toString.call(e), "date");
-        if (W(e))
-          return qr(e);
-      }
-      var c = "", l = false, g = ["{", "}"];
-      if (at(e) && (l = true, g = ["[", "]"]), yr(e)) {
-        var S = e.name ? ": " + e.name : "";
-        c = " [Function" + S + "]";
-      }
-      if (G(e) && (c = " " + RegExp.prototype.toString.call(e)), cr(e) && (c = " " + Date.prototype.toUTCString.call(e)), W(e) && (c = " " + qr(e)), i.length === 0 && (!l || e.length == 0))
-        return g[0] + c + g[1];
-      if (t < 0)
-        return G(e) ? r.stylize(RegExp.prototype.toString.call(e), "regexp") : r.stylize("[Object]", "special");
-      r.seen.push(e);
-      var d;
-      return l ? d = eo(r, e, t, a, i) : d = i.map(function(T) {
-        return Wr(r, e, t, a, T, l);
-      }), r.seen.pop(), to(d, c, g);
-    }
-    function ro(r, e) {
-      if (w(e))
-        return r.stylize("undefined", "undefined");
-      if (lr(e)) {
-        var t = "'" + JSON.stringify(e).replace(/^"|"$/g, "").replace(/'/g, "\\'").replace(/\\"/g, '"') + "'";
-        return r.stylize(t, "string");
-      }
-      if (ft(e))
-        return r.stylize("" + e, "number");
-      if (_r(e))
-        return r.stylize("" + e, "boolean");
-      if (pr(e))
-        return r.stylize("null", "null");
-    }
-    function qr(r) {
-      return "[" + Error.prototype.toString.call(r) + "]";
-    }
-    function eo(r, e, t, n, o) {
-      for (var i = [], a = 0, f = e.length;a < f; ++a)
-        ut(e, String(a)) ? i.push(Wr(r, e, t, n, String(a), true)) : i.push("");
-      return o.forEach(function(c) {
-        c.match(/^\d+$/) || i.push(Wr(r, e, t, n, c, true));
-      }), i;
-    }
-    function Wr(r, e, t, n, o, i) {
-      var a, f, c;
-      if (c = Object.getOwnPropertyDescriptor(e, o) || { value: e[o] }, c.get ? c.set ? f = r.stylize("[Getter/Setter]", "special") : f = r.stylize("[Getter]", "special") : c.set && (f = r.stylize("[Setter]", "special")), ut(n, o) || (a = "[" + o + "]"), f || (r.seen.indexOf(c.value) < 0 ? (pr(t) ? f = sr(r, c.value, null) : f = sr(r, c.value, t - 1), f.indexOf(`
-`) > -1 && (i ? f = f.split(`
-`).map(function(l) {
-        return "  " + l;
-      }).join(`
-`).slice(2) : f = `
-` + f.split(`
-`).map(function(l) {
-        return "   " + l;
-      }).join(`
-`))) : f = r.stylize("[Circular]", "special")), w(a)) {
-        if (i && o.match(/^\d+$/))
-          return f;
-        a = JSON.stringify("" + o), a.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/) ? (a = a.slice(1, -1), a = r.stylize(a, "name")) : (a = a.replace(/'/g, "\\'").replace(/\\"/g, '"').replace(/(^"|"$)/g, "'"), a = r.stylize(a, "string"));
-      }
-      return a + ": " + f;
-    }
-    function to(r, e, t) {
-      var n = 0, o = r.reduce(function(i, a) {
-        return n++, a.indexOf(`
-`) >= 0 && n++, i + a.replace(/\u001b\[\d\d?m/g, "").length + 1;
-      }, 0);
-      return o > 60 ? t[0] + (e === "" ? "" : e + `
- `) + " " + r.join(`,
-  `) + " " + t[1] : t[0] + e + " " + r.join(", ") + " " + t[1];
-    }
-    y.types = rt();
-    function at(r) {
-      return Array.isArray(r);
-    }
-    y.isArray = at;
-    function _r(r) {
-      return typeof r == "boolean";
-    }
-    y.isBoolean = _r;
-    function pr(r) {
-      return r === null;
-    }
-    y.isNull = pr;
-    function no(r) {
-      return r == null;
-    }
-    y.isNullOrUndefined = no;
-    function ft(r) {
-      return typeof r == "number";
-    }
-    y.isNumber = ft;
-    function lr(r) {
-      return typeof r == "string";
-    }
-    y.isString = lr;
-    function oo(r) {
-      return typeof r == "symbol";
-    }
-    y.isSymbol = oo;
-    function w(r) {
-      return r === undefined;
-    }
-    y.isUndefined = w;
-    function G(r) {
-      return M(r) && zr(r) === "[object RegExp]";
-    }
-    y.isRegExp = G;
-    y.types.isRegExp = G;
-    function M(r) {
-      return typeof r == "object" && r !== null;
-    }
-    y.isObject = M;
-    function cr(r) {
-      return M(r) && zr(r) === "[object Date]";
-    }
-    y.isDate = cr;
-    y.types.isDate = cr;
-    function W(r) {
-      return M(r) && (zr(r) === "[object Error]" || r instanceof Error);
-    }
-    y.isError = W;
-    y.types.isNativeError = W;
-    function yr(r) {
-      return typeof r == "function";
-    }
-    y.isFunction = yr;
-    function io(r) {
-      return r === null || typeof r == "boolean" || typeof r == "number" || typeof r == "string" || typeof r == "symbol" || typeof r > "u";
-    }
-    y.isPrimitive = io;
-    y.isBuffer = tt();
-    function zr(r) {
-      return Object.prototype.toString.call(r);
-    }
-    function Gr(r) {
-      return r < 10 ? "0" + r.toString(10) : r.toString(10);
-    }
-    var ao = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    function fo() {
-      var r = new Date, e = [Gr(r.getHours()), Gr(r.getMinutes()), Gr(r.getSeconds())].join(":");
-      return [r.getDate(), ao[r.getMonth()], e].join(" ");
-    }
-    y.log = function() {
-      console.log("%s - %s", fo(), y.format.apply(y, arguments));
-    };
-    y.inherits = nt();
-    y._extend = function(r, e) {
-      if (!e || !M(e))
-        return r;
-      for (var t = Object.keys(e), n = t.length;n--; )
-        r[t[n]] = e[t[n]];
-      return r;
-    };
-    function ut(r, e) {
-      return Object.prototype.hasOwnProperty.call(r, e);
-    }
-    var P = typeof Symbol < "u" ? Symbol("util.promisify.custom") : undefined;
-    y.promisify = function(e) {
-      if (typeof e != "function")
-        throw new TypeError('The "original" argument must be of type Function');
-      if (P && e[P]) {
-        var t = e[P];
-        if (typeof t != "function")
-          throw new TypeError('The "util.promisify.custom" argument must be of type Function');
-        return Object.defineProperty(t, P, { value: t, enumerable: false, writable: false, configurable: true }), t;
-      }
-      function t() {
-        for (var n, o, i = new Promise(function(c, l) {
-          n = c, o = l;
-        }), a = [], f = 0;f < arguments.length; f++)
-          a.push(arguments[f]);
-        a.push(function(c, l) {
-          c ? o(c) : n(l);
-        });
-        try {
-          e.apply(this, a);
-        } catch (c) {
-          o(c);
-        }
-        return i;
-      }
-      return Object.setPrototypeOf(t, Object.getPrototypeOf(e)), P && Object.defineProperty(t, P, { value: t, enumerable: false, writable: false, configurable: true }), Object.defineProperties(t, ot(e));
-    };
-    y.promisify.custom = P;
-    function uo(r, e) {
-      if (!r) {
-        var t = new Error("Promise was rejected with a falsy value");
-        t.reason = r, r = t;
-      }
-      return e(r);
-    }
-    function yo(r) {
-      if (typeof r != "function")
-        throw new TypeError('The "original" argument must be of type Function');
-      function e() {
-        for (var t = [], n = 0;n < arguments.length; n++)
-          t.push(arguments[n]);
-        var o = t.pop();
-        if (typeof o != "function")
-          throw new TypeError("The last argument must be of type Function");
-        var i = this, a = function() {
-          return o.apply(i, arguments);
-        };
-        r.apply(this, t).then(function(f) {
-          process.nextTick(a.bind(null, null, f));
-        }, function(f) {
-          process.nextTick(uo.bind(null, f, a));
-        });
-      }
-      return Object.setPrototypeOf(e, Object.getPrototypeOf(r)), Object.defineProperties(e, ot(r)), e;
-    }
-    y.callbackify = yo;
-  });
-  E = {};
-  At(E, { TextDecoder: () => ct, TextEncoder: () => st, default: () => so });
-  F(E, mt(yt()));
-  st = globalThis.TextEncoder;
-  ct = globalThis.TextDecoder;
-  so = { TextEncoder: st, TextDecoder: ct };
-});
+// node_modules/yargs-parser/build/lib/index.js
+import {format} from "util";
+import {normalize, resolve} from "path";
 
-// node:path
-var exports_path = {};
-__export(exports_path, {
-  default: () => {
-    {
-      return q;
-    }
+// node_modules/yargs-parser/build/lib/string-utils.js
+function camelCase(str) {
+  const isCamelCase = str !== str.toLowerCase() && str !== str.toUpperCase();
+  if (!isCamelCase) {
+    str = str.toLowerCase();
   }
-});
-var L, b, z2, D, T, R, _, E2, C, A, y, h, m, q;
-var init_path = __esm(() => {
-  L = Object.create;
-  b = Object.defineProperty;
-  z2 = Object.getOwnPropertyDescriptor;
-  D = Object.getOwnPropertyNames;
-  T = Object.getPrototypeOf;
-  R = Object.prototype.hasOwnProperty;
-  _ = (f, e) => () => (e || f((e = { exports: {} }).exports, e), e.exports);
-  E2 = (f, e) => {
-    for (var r in e)
-      b(f, r, { get: e[r], enumerable: true });
-  };
-  C = (f, e, r, l) => {
-    if (e && typeof e == "object" || typeof e == "function")
-      for (let i of D(e))
-        !R.call(f, i) && i !== r && b(f, i, { get: () => e[i], enumerable: !(l = z2(e, i)) || l.enumerable });
-    return f;
-  };
-  A = (f, e, r) => (C(f, e, "default"), r && C(r, e, "default"));
-  y = (f, e, r) => (r = f != null ? L(T(f)) : {}, C(e || !f || !f.__esModule ? b(r, "default", { value: f, enumerable: true }) : r, f));
-  h = _((F2, S) => {
-    function c(f) {
-      if (typeof f != "string")
-        throw new TypeError("Path must be a string. Received " + JSON.stringify(f));
+  if (str.indexOf("-") === -1 && str.indexOf("_") === -1) {
+    return str;
+  } else {
+    let camelcase = "";
+    let nextChrUpper = false;
+    const leadingHyphens = str.match(/^-+/);
+    for (let i = leadingHyphens ? leadingHyphens[0].length : 0;i < str.length; i++) {
+      let chr = str.charAt(i);
+      if (nextChrUpper) {
+        nextChrUpper = false;
+        chr = chr.toUpperCase();
+      }
+      if (i !== 0 && (chr === "-" || chr === "_")) {
+        nextChrUpper = true;
+      } else if (chr !== "-" && chr !== "_") {
+        camelcase += chr;
+      }
     }
-    function w(f, e) {
-      for (var r = "", l = 0, i = -1, s = 0, n, t = 0;t <= f.length; ++t) {
-        if (t < f.length)
-          n = f.charCodeAt(t);
-        else {
-          if (n === 47)
-            break;
-          n = 47;
-        }
-        if (n === 47) {
-          if (!(i === t - 1 || s === 1))
-            if (i !== t - 1 && s === 2) {
-              if (r.length < 2 || l !== 2 || r.charCodeAt(r.length - 1) !== 46 || r.charCodeAt(r.length - 2) !== 46) {
-                if (r.length > 2) {
-                  var a = r.lastIndexOf("/");
-                  if (a !== r.length - 1) {
-                    a === -1 ? (r = "", l = 0) : (r = r.slice(0, a), l = r.length - 1 - r.lastIndexOf("/")), i = t, s = 0;
-                    continue;
-                  }
-                } else if (r.length === 2 || r.length === 1) {
-                  r = "", l = 0, i = t, s = 0;
-                  continue;
-                }
-              }
-              e && (r.length > 0 ? r += "/.." : r = "..", l = 2);
-            } else
-              r.length > 0 ? r += "/" + f.slice(i + 1, t) : r = f.slice(i + 1, t), l = t - i - 1;
-          i = t, s = 0;
-        } else
-          n === 46 && s !== -1 ? ++s : s = -1;
-      }
-      return r;
-    }
-    function J(f, e) {
-      var r = e.dir || e.root, l = e.base || (e.name || "") + (e.ext || "");
-      return r ? r === e.root ? r + l : r + f + l : l;
-    }
-    var g = { resolve: function() {
-      for (var e = "", r = false, l, i = arguments.length - 1;i >= -1 && !r; i--) {
-        var s;
-        i >= 0 ? s = arguments[i] : (l === undefined && (l = process.cwd()), s = l), c(s), s.length !== 0 && (e = s + "/" + e, r = s.charCodeAt(0) === 47);
-      }
-      return e = w(e, !r), r ? e.length > 0 ? "/" + e : "/" : e.length > 0 ? e : ".";
-    }, normalize: function(e) {
-      if (c(e), e.length === 0)
-        return ".";
-      var r = e.charCodeAt(0) === 47, l = e.charCodeAt(e.length - 1) === 47;
-      return e = w(e, !r), e.length === 0 && !r && (e = "."), e.length > 0 && l && (e += "/"), r ? "/" + e : e;
-    }, isAbsolute: function(e) {
-      return c(e), e.length > 0 && e.charCodeAt(0) === 47;
-    }, join: function() {
-      if (arguments.length === 0)
-        return ".";
-      for (var e, r = 0;r < arguments.length; ++r) {
-        var l = arguments[r];
-        c(l), l.length > 0 && (e === undefined ? e = l : e += "/" + l);
-      }
-      return e === undefined ? "." : g.normalize(e);
-    }, relative: function(e, r) {
-      if (c(e), c(r), e === r || (e = g.resolve(e), r = g.resolve(r), e === r))
-        return "";
-      for (var l = 1;l < e.length && e.charCodeAt(l) === 47; ++l)
-        ;
-      for (var i = e.length, s = i - l, n = 1;n < r.length && r.charCodeAt(n) === 47; ++n)
-        ;
-      for (var t = r.length, a = t - n, v = s < a ? s : a, u = -1, o = 0;o <= v; ++o) {
-        if (o === v) {
-          if (a > v) {
-            if (r.charCodeAt(n + o) === 47)
-              return r.slice(n + o + 1);
-            if (o === 0)
-              return r.slice(n + o);
-          } else
-            s > v && (e.charCodeAt(l + o) === 47 ? u = o : o === 0 && (u = 0));
-          break;
-        }
-        var k = e.charCodeAt(l + o), P = r.charCodeAt(n + o);
-        if (k !== P)
-          break;
-        k === 47 && (u = o);
-      }
-      var d = "";
-      for (o = l + u + 1;o <= i; ++o)
-        (o === i || e.charCodeAt(o) === 47) && (d.length === 0 ? d += ".." : d += "/..");
-      return d.length > 0 ? d + r.slice(n + u) : (n += u, r.charCodeAt(n) === 47 && ++n, r.slice(n));
-    }, _makeLong: function(e) {
-      return e;
-    }, dirname: function(e) {
-      if (c(e), e.length === 0)
-        return ".";
-      for (var r = e.charCodeAt(0), l = r === 47, i = -1, s = true, n = e.length - 1;n >= 1; --n)
-        if (r = e.charCodeAt(n), r === 47) {
-          if (!s) {
-            i = n;
-            break;
-          }
-        } else
-          s = false;
-      return i === -1 ? l ? "/" : "." : l && i === 1 ? "//" : e.slice(0, i);
-    }, basename: function(e, r) {
-      if (r !== undefined && typeof r != "string")
-        throw new TypeError('"ext" argument must be a string');
-      c(e);
-      var l = 0, i = -1, s = true, n;
-      if (r !== undefined && r.length > 0 && r.length <= e.length) {
-        if (r.length === e.length && r === e)
-          return "";
-        var t = r.length - 1, a = -1;
-        for (n = e.length - 1;n >= 0; --n) {
-          var v = e.charCodeAt(n);
-          if (v === 47) {
-            if (!s) {
-              l = n + 1;
-              break;
-            }
-          } else
-            a === -1 && (s = false, a = n + 1), t >= 0 && (v === r.charCodeAt(t) ? --t === -1 && (i = n) : (t = -1, i = a));
-        }
-        return l === i ? i = a : i === -1 && (i = e.length), e.slice(l, i);
-      } else {
-        for (n = e.length - 1;n >= 0; --n)
-          if (e.charCodeAt(n) === 47) {
-            if (!s) {
-              l = n + 1;
-              break;
-            }
-          } else
-            i === -1 && (s = false, i = n + 1);
-        return i === -1 ? "" : e.slice(l, i);
-      }
-    }, extname: function(e) {
-      c(e);
-      for (var r = -1, l = 0, i = -1, s = true, n = 0, t = e.length - 1;t >= 0; --t) {
-        var a = e.charCodeAt(t);
-        if (a === 47) {
-          if (!s) {
-            l = t + 1;
-            break;
-          }
-          continue;
-        }
-        i === -1 && (s = false, i = t + 1), a === 46 ? r === -1 ? r = t : n !== 1 && (n = 1) : r !== -1 && (n = -1);
-      }
-      return r === -1 || i === -1 || n === 0 || n === 1 && r === i - 1 && r === l + 1 ? "" : e.slice(r, i);
-    }, format: function(e) {
-      if (e === null || typeof e != "object")
-        throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof e);
-      return J("/", e);
-    }, parse: function(e) {
-      c(e);
-      var r = { root: "", dir: "", base: "", ext: "", name: "" };
-      if (e.length === 0)
-        return r;
-      var l = e.charCodeAt(0), i = l === 47, s;
-      i ? (r.root = "/", s = 1) : s = 0;
-      for (var n = -1, t = 0, a = -1, v = true, u = e.length - 1, o = 0;u >= s; --u) {
-        if (l = e.charCodeAt(u), l === 47) {
-          if (!v) {
-            t = u + 1;
-            break;
-          }
-          continue;
-        }
-        a === -1 && (v = false, a = u + 1), l === 46 ? n === -1 ? n = u : o !== 1 && (o = 1) : n !== -1 && (o = -1);
-      }
-      return n === -1 || a === -1 || o === 0 || o === 1 && n === a - 1 && n === t + 1 ? a !== -1 && (t === 0 && i ? r.base = r.name = e.slice(1, a) : r.base = r.name = e.slice(t, a)) : (t === 0 && i ? (r.name = e.slice(1, n), r.base = e.slice(1, a)) : (r.name = e.slice(t, n), r.base = e.slice(t, a)), r.ext = e.slice(n, a)), t > 0 ? r.dir = e.slice(0, t - 1) : i && (r.dir = "/"), r;
-    }, sep: "/", delimiter: ":", win32: null, posix: null };
-    g.posix = g;
-    S.exports = g;
-  });
-  m = {};
-  E2(m, { default: () => q });
-  A(m, y(h()));
-  q = y(h());
-});
-
-// node_modules/yargs-parser/build/index.cjs
-var require_build = __commonJS((exports, module) => {
-  var camelCase2 = function(str) {
-    const isCamelCase = str !== str.toLowerCase() && str !== str.toUpperCase();
-    if (!isCamelCase) {
-      str = str.toLowerCase();
-    }
-    if (str.indexOf("-") === -1 && str.indexOf("_") === -1) {
-      return str;
+    return camelcase;
+  }
+}
+function decamelize(str, joinString) {
+  const lowercase = str.toLowerCase();
+  joinString = joinString || "-";
+  let notCamelcase = "";
+  for (let i = 0;i < str.length; i++) {
+    const chrLower = lowercase.charAt(i);
+    const chrString = str.charAt(i);
+    if (chrLower !== chrString && i > 0) {
+      notCamelcase += `${joinString}${lowercase.charAt(i)}`;
     } else {
-      let camelcase = "";
-      let nextChrUpper = false;
-      const leadingHyphens = str.match(/^-+/);
-      for (let i = leadingHyphens ? leadingHyphens[0].length : 0;i < str.length; i++) {
-        let chr = str.charAt(i);
-        if (nextChrUpper) {
-          nextChrUpper = false;
-          chr = chr.toUpperCase();
-        }
-        if (i !== 0 && (chr === "-" || chr === "_")) {
-          nextChrUpper = true;
-        } else if (chr !== "-" && chr !== "_") {
-          camelcase += chr;
-        }
-      }
-      return camelcase;
+      notCamelcase += chrString;
     }
-  };
-  var decamelize = function(str, joinString) {
-    const lowercase = str.toLowerCase();
-    joinString = joinString || "-";
-    let notCamelcase = "";
-    for (let i = 0;i < str.length; i++) {
-      const chrLower = lowercase.charAt(i);
-      const chrString = str.charAt(i);
-      if (chrLower !== chrString && i > 0) {
-        notCamelcase += `${joinString}${lowercase.charAt(i)}`;
-      } else {
-        notCamelcase += chrString;
-      }
-    }
-    return notCamelcase;
-  };
-  var looksLikeNumber = function(x) {
-    if (x === null || x === undefined)
-      return false;
-    if (typeof x === "number")
-      return true;
-    if (/^0x[0-9a-f]+$/i.test(x))
-      return true;
-    if (/^0[^.]/.test(x))
-      return false;
-    return /^[-]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
-  };
-  var tokenizeArgString = function(argString) {
-    if (Array.isArray(argString)) {
-      return argString.map((e) => typeof e !== "string" ? e + "" : e);
-    }
-    argString = argString.trim();
-    let i = 0;
-    let prevC = null;
-    let c = null;
-    let opening = null;
-    const args = [];
-    for (let ii = 0;ii < argString.length; ii++) {
-      prevC = c;
-      c = argString.charAt(ii);
-      if (c === " " && !opening) {
-        if (!(prevC === " ")) {
-          i++;
-        }
-        continue;
-      }
-      if (c === opening) {
-        opening = null;
-      } else if ((c === "'" || c === '"') && !opening) {
-        opening = c;
-      }
-      if (!args[i])
-        args[i] = "";
-      args[i] += c;
-    }
-    return args;
-  };
-  var combineAliases = function(aliases) {
-    const aliasArrays = [];
-    const combined = Object.create(null);
-    let change = true;
-    Object.keys(aliases).forEach(function(key) {
-      aliasArrays.push([].concat(aliases[key], key));
-    });
-    while (change) {
-      change = false;
-      for (let i = 0;i < aliasArrays.length; i++) {
-        for (let ii = i + 1;ii < aliasArrays.length; ii++) {
-          const intersect = aliasArrays[i].filter(function(v) {
-            return aliasArrays[ii].indexOf(v) !== -1;
-          });
-          if (intersect.length) {
-            aliasArrays[i] = aliasArrays[i].concat(aliasArrays[ii]);
-            aliasArrays.splice(ii, 1);
-            change = true;
-            break;
-          }
-        }
-      }
-    }
-    aliasArrays.forEach(function(aliasArray) {
-      aliasArray = aliasArray.filter(function(v, i, self) {
-        return self.indexOf(v) === i;
-      });
-      const lastAlias = aliasArray.pop();
-      if (lastAlias !== undefined && typeof lastAlias === "string") {
-        combined[lastAlias] = aliasArray;
-      }
-    });
-    return combined;
-  };
-  var increment = function(orig) {
-    return orig !== undefined ? orig + 1 : 1;
-  };
-  var sanitizeKey = function(key) {
-    if (key === "__proto__")
-      return "___proto___";
-    return key;
-  };
-  var stripQuotes = function(val) {
-    return typeof val === "string" && (val[0] === "'" || val[0] === '"') && val[val.length - 1] === val[0] ? val.substring(1, val.length - 1) : val;
-  };
-  var util2 = (init_util(), __toCommonJS(exports_util));
-  var path = (init_path(), __toCommonJS(exports_path));
-  var fs = (()=>({}));
-  var DefaultValuesForTypeKey;
-  (function(DefaultValuesForTypeKey2) {
-    DefaultValuesForTypeKey2["BOOLEAN"] = "boolean";
-    DefaultValuesForTypeKey2["STRING"] = "string";
-    DefaultValuesForTypeKey2["NUMBER"] = "number";
-    DefaultValuesForTypeKey2["ARRAY"] = "array";
-  })(DefaultValuesForTypeKey || (DefaultValuesForTypeKey = {}));
-  var mixin;
+  }
+  return notCamelcase;
+}
+function looksLikeNumber(x) {
+  if (x === null || x === undefined)
+    return false;
+  if (typeof x === "number")
+    return true;
+  if (/^0x[0-9a-f]+$/i.test(x))
+    return true;
+  if (/^0[^.]/.test(x))
+    return false;
+  return /^[-]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(x);
+}
 
-  class YargsParser {
-    constructor(_mixin) {
-      mixin = _mixin;
+// node_modules/yargs-parser/build/lib/tokenize-arg-string.js
+function tokenizeArgString(argString) {
+  if (Array.isArray(argString)) {
+    return argString.map((e) => typeof e !== "string" ? e + "" : e);
+  }
+  argString = argString.trim();
+  let i = 0;
+  let prevC = null;
+  let c = null;
+  let opening = null;
+  const args = [];
+  for (let ii = 0;ii < argString.length; ii++) {
+    prevC = c;
+    c = argString.charAt(ii);
+    if (c === " " && !opening) {
+      if (!(prevC === " ")) {
+        i++;
+      }
+      continue;
     }
-    parse(argsInput, options) {
-      const opts = Object.assign({
-        alias: undefined,
-        array: undefined,
-        boolean: undefined,
-        config: undefined,
-        configObjects: undefined,
-        configuration: undefined,
-        coerce: undefined,
-        count: undefined,
-        default: undefined,
-        envPrefix: undefined,
-        narg: undefined,
-        normalize: undefined,
-        string: undefined,
-        number: undefined,
-        __: undefined,
-        key: undefined
-      }, options);
-      const args = tokenizeArgString(argsInput);
-      const inputIsString = typeof argsInput === "string";
-      const aliases = combineAliases(Object.assign(Object.create(null), opts.alias));
-      const configuration = Object.assign({
-        "boolean-negation": true,
-        "camel-case-expansion": true,
-        "combine-arrays": false,
-        "dot-notation": true,
-        "duplicate-arguments-array": true,
-        "flatten-duplicate-arrays": true,
-        "greedy-arrays": true,
-        "halt-at-non-option": false,
-        "nargs-eats-options": false,
-        "negation-prefix": "no-",
-        "parse-numbers": true,
-        "parse-positional-numbers": true,
-        "populate--": false,
-        "set-placeholder-key": false,
-        "short-option-groups": true,
-        "strip-aliased": false,
-        "strip-dashed": false,
-        "unknown-options-as-args": false
-      }, opts.configuration);
-      const defaults = Object.assign(Object.create(null), opts.default);
-      const configObjects = opts.configObjects || [];
-      const envPrefix = opts.envPrefix;
-      const notFlagsOption = configuration["populate--"];
-      const notFlagsArgv = notFlagsOption ? "--" : "_";
-      const newAliases = Object.create(null);
-      const defaulted = Object.create(null);
-      const __ = opts.__ || mixin.format;
-      const flags = {
-        aliases: Object.create(null),
-        arrays: Object.create(null),
-        bools: Object.create(null),
-        strings: Object.create(null),
-        numbers: Object.create(null),
-        counts: Object.create(null),
-        normalize: Object.create(null),
-        configs: Object.create(null),
-        nargs: Object.create(null),
-        coercions: Object.create(null),
-        keys: []
-      };
-      const negative = /^-([0-9]+(\.[0-9]+)?|\.[0-9]+)$/;
-      const negatedBoolean = new RegExp("^--" + configuration["negation-prefix"] + "(.+)");
-      [].concat(opts.array || []).filter(Boolean).forEach(function(opt) {
-        const key = typeof opt === "object" ? opt.key : opt;
-        const assignment = Object.keys(opt).map(function(key2) {
-          const arrayFlagKeys = {
-            boolean: "bools",
-            string: "strings",
-            number: "numbers"
-          };
-          return arrayFlagKeys[key2];
-        }).filter(Boolean).pop();
-        if (assignment) {
-          flags[assignment][key] = true;
-        }
-        flags.arrays[key] = true;
-        flags.keys.push(key);
-      });
-      [].concat(opts.boolean || []).filter(Boolean).forEach(function(key) {
-        flags.bools[key] = true;
-        flags.keys.push(key);
-      });
-      [].concat(opts.string || []).filter(Boolean).forEach(function(key) {
-        flags.strings[key] = true;
-        flags.keys.push(key);
-      });
-      [].concat(opts.number || []).filter(Boolean).forEach(function(key) {
-        flags.numbers[key] = true;
-        flags.keys.push(key);
-      });
-      [].concat(opts.count || []).filter(Boolean).forEach(function(key) {
-        flags.counts[key] = true;
-        flags.keys.push(key);
-      });
-      [].concat(opts.normalize || []).filter(Boolean).forEach(function(key) {
-        flags.normalize[key] = true;
-        flags.keys.push(key);
-      });
-      if (typeof opts.narg === "object") {
-        Object.entries(opts.narg).forEach(([key, value]) => {
-          if (typeof value === "number") {
-            flags.nargs[key] = value;
-            flags.keys.push(key);
-          }
+    if (c === opening) {
+      opening = null;
+    } else if ((c === "'" || c === '"') && !opening) {
+      opening = c;
+    }
+    if (!args[i])
+      args[i] = "";
+    args[i] += c;
+  }
+  return args;
+}
+
+// node_modules/yargs-parser/build/lib/yargs-parser-types.js
+var DefaultValuesForTypeKey;
+(function(DefaultValuesForTypeKey2) {
+  DefaultValuesForTypeKey2["BOOLEAN"] = "boolean";
+  DefaultValuesForTypeKey2["STRING"] = "string";
+  DefaultValuesForTypeKey2["NUMBER"] = "number";
+  DefaultValuesForTypeKey2["ARRAY"] = "array";
+})(DefaultValuesForTypeKey || (DefaultValuesForTypeKey = {}));
+
+// node_modules/yargs-parser/build/lib/yargs-parser.js
+var combineAliases = function(aliases) {
+  const aliasArrays = [];
+  const combined = Object.create(null);
+  let change = true;
+  Object.keys(aliases).forEach(function(key) {
+    aliasArrays.push([].concat(aliases[key], key));
+  });
+  while (change) {
+    change = false;
+    for (let i = 0;i < aliasArrays.length; i++) {
+      for (let ii = i + 1;ii < aliasArrays.length; ii++) {
+        const intersect = aliasArrays[i].filter(function(v) {
+          return aliasArrays[ii].indexOf(v) !== -1;
         });
-      }
-      if (typeof opts.coerce === "object") {
-        Object.entries(opts.coerce).forEach(([key, value]) => {
-          if (typeof value === "function") {
-            flags.coercions[key] = value;
-            flags.keys.push(key);
-          }
-        });
-      }
-      if (typeof opts.config !== "undefined") {
-        if (Array.isArray(opts.config) || typeof opts.config === "string") {
-          [].concat(opts.config).filter(Boolean).forEach(function(key) {
-            flags.configs[key] = true;
-          });
-        } else if (typeof opts.config === "object") {
-          Object.entries(opts.config).forEach(([key, value]) => {
-            if (typeof value === "boolean" || typeof value === "function") {
-              flags.configs[key] = value;
-            }
-          });
+        if (intersect.length) {
+          aliasArrays[i] = aliasArrays[i].concat(aliasArrays[ii]);
+          aliasArrays.splice(ii, 1);
+          change = true;
+          break;
         }
       }
-      extendAliases(opts.key, aliases, opts.default, flags.arrays);
-      Object.keys(defaults).forEach(function(key) {
-        (flags.aliases[key] || []).forEach(function(alias) {
-          defaults[alias] = defaults[key];
-        });
+    }
+  }
+  aliasArrays.forEach(function(aliasArray) {
+    aliasArray = aliasArray.filter(function(v, i, self) {
+      return self.indexOf(v) === i;
+    });
+    const lastAlias = aliasArray.pop();
+    if (lastAlias !== undefined && typeof lastAlias === "string") {
+      combined[lastAlias] = aliasArray;
+    }
+  });
+  return combined;
+};
+var increment = function(orig) {
+  return orig !== undefined ? orig + 1 : 1;
+};
+var sanitizeKey = function(key) {
+  if (key === "__proto__")
+    return "___proto___";
+  return key;
+};
+var stripQuotes = function(val) {
+  return typeof val === "string" && (val[0] === "'" || val[0] === '"') && val[val.length - 1] === val[0] ? val.substring(1, val.length - 1) : val;
+};
+var mixin;
+
+class YargsParser {
+  constructor(_mixin) {
+    mixin = _mixin;
+  }
+  parse(argsInput, options) {
+    const opts = Object.assign({
+      alias: undefined,
+      array: undefined,
+      boolean: undefined,
+      config: undefined,
+      configObjects: undefined,
+      configuration: undefined,
+      coerce: undefined,
+      count: undefined,
+      default: undefined,
+      envPrefix: undefined,
+      narg: undefined,
+      normalize: undefined,
+      string: undefined,
+      number: undefined,
+      __: undefined,
+      key: undefined
+    }, options);
+    const args = tokenizeArgString(argsInput);
+    const inputIsString = typeof argsInput === "string";
+    const aliases = combineAliases(Object.assign(Object.create(null), opts.alias));
+    const configuration = Object.assign({
+      "boolean-negation": true,
+      "camel-case-expansion": true,
+      "combine-arrays": false,
+      "dot-notation": true,
+      "duplicate-arguments-array": true,
+      "flatten-duplicate-arrays": true,
+      "greedy-arrays": true,
+      "halt-at-non-option": false,
+      "nargs-eats-options": false,
+      "negation-prefix": "no-",
+      "parse-numbers": true,
+      "parse-positional-numbers": true,
+      "populate--": false,
+      "set-placeholder-key": false,
+      "short-option-groups": true,
+      "strip-aliased": false,
+      "strip-dashed": false,
+      "unknown-options-as-args": false
+    }, opts.configuration);
+    const defaults = Object.assign(Object.create(null), opts.default);
+    const configObjects = opts.configObjects || [];
+    const envPrefix = opts.envPrefix;
+    const notFlagsOption = configuration["populate--"];
+    const notFlagsArgv = notFlagsOption ? "--" : "_";
+    const newAliases = Object.create(null);
+    const defaulted = Object.create(null);
+    const __ = opts.__ || mixin.format;
+    const flags = {
+      aliases: Object.create(null),
+      arrays: Object.create(null),
+      bools: Object.create(null),
+      strings: Object.create(null),
+      numbers: Object.create(null),
+      counts: Object.create(null),
+      normalize: Object.create(null),
+      configs: Object.create(null),
+      nargs: Object.create(null),
+      coercions: Object.create(null),
+      keys: []
+    };
+    const negative = /^-([0-9]+(\.[0-9]+)?|\.[0-9]+)$/;
+    const negatedBoolean = new RegExp("^--" + configuration["negation-prefix"] + "(.+)");
+    [].concat(opts.array || []).filter(Boolean).forEach(function(opt) {
+      const key = typeof opt === "object" ? opt.key : opt;
+      const assignment = Object.keys(opt).map(function(key2) {
+        const arrayFlagKeys = {
+          boolean: "bools",
+          string: "strings",
+          number: "numbers"
+        };
+        return arrayFlagKeys[key2];
+      }).filter(Boolean).pop();
+      if (assignment) {
+        flags[assignment][key] = true;
+      }
+      flags.arrays[key] = true;
+      flags.keys.push(key);
+    });
+    [].concat(opts.boolean || []).filter(Boolean).forEach(function(key) {
+      flags.bools[key] = true;
+      flags.keys.push(key);
+    });
+    [].concat(opts.string || []).filter(Boolean).forEach(function(key) {
+      flags.strings[key] = true;
+      flags.keys.push(key);
+    });
+    [].concat(opts.number || []).filter(Boolean).forEach(function(key) {
+      flags.numbers[key] = true;
+      flags.keys.push(key);
+    });
+    [].concat(opts.count || []).filter(Boolean).forEach(function(key) {
+      flags.counts[key] = true;
+      flags.keys.push(key);
+    });
+    [].concat(opts.normalize || []).filter(Boolean).forEach(function(key) {
+      flags.normalize[key] = true;
+      flags.keys.push(key);
+    });
+    if (typeof opts.narg === "object") {
+      Object.entries(opts.narg).forEach(([key, value]) => {
+        if (typeof value === "number") {
+          flags.nargs[key] = value;
+          flags.keys.push(key);
+        }
       });
-      let error = null;
-      checkConfiguration();
-      let notFlags = [];
-      const argv = Object.assign(Object.create(null), { _: [] });
-      const argvReturn = {};
-      for (let i = 0;i < args.length; i++) {
-        const arg = args[i];
-        const truncatedArg = arg.replace(/^-{3,}/, "---");
-        let broken;
-        let key;
-        let letters;
-        let m2;
-        let next;
-        let value;
-        if (arg !== "--" && /^-/.test(arg) && isUnknownOptionAsArg(arg)) {
-          pushPositional(arg);
-        } else if (truncatedArg.match(/^---+(=|$)/)) {
-          pushPositional(arg);
-          continue;
-        } else if (arg.match(/^--.+=/) || !configuration["short-option-groups"] && arg.match(/^-.+=/)) {
-          m2 = arg.match(/^--?([^=]+)=([\s\S]*)$/);
-          if (m2 !== null && Array.isArray(m2) && m2.length >= 3) {
-            if (checkAllAliases(m2[1], flags.arrays)) {
-              i = eatArray(i, m2[1], args, m2[2]);
-            } else if (checkAllAliases(m2[1], flags.nargs) !== false) {
-              i = eatNargs(i, m2[1], args, m2[2]);
-            } else {
-              setArg(m2[1], m2[2], true);
-            }
+    }
+    if (typeof opts.coerce === "object") {
+      Object.entries(opts.coerce).forEach(([key, value]) => {
+        if (typeof value === "function") {
+          flags.coercions[key] = value;
+          flags.keys.push(key);
+        }
+      });
+    }
+    if (typeof opts.config !== "undefined") {
+      if (Array.isArray(opts.config) || typeof opts.config === "string") {
+        [].concat(opts.config).filter(Boolean).forEach(function(key) {
+          flags.configs[key] = true;
+        });
+      } else if (typeof opts.config === "object") {
+        Object.entries(opts.config).forEach(([key, value]) => {
+          if (typeof value === "boolean" || typeof value === "function") {
+            flags.configs[key] = value;
           }
-        } else if (arg.match(negatedBoolean) && configuration["boolean-negation"]) {
-          m2 = arg.match(negatedBoolean);
-          if (m2 !== null && Array.isArray(m2) && m2.length >= 2) {
-            key = m2[1];
-            setArg(key, checkAllAliases(key, flags.arrays) ? [false] : false);
+        });
+      }
+    }
+    extendAliases(opts.key, aliases, opts.default, flags.arrays);
+    Object.keys(defaults).forEach(function(key) {
+      (flags.aliases[key] || []).forEach(function(alias) {
+        defaults[alias] = defaults[key];
+      });
+    });
+    let error = null;
+    checkConfiguration();
+    let notFlags = [];
+    const argv = Object.assign(Object.create(null), { _: [] });
+    const argvReturn = {};
+    for (let i = 0;i < args.length; i++) {
+      const arg = args[i];
+      const truncatedArg = arg.replace(/^-{3,}/, "---");
+      let broken;
+      let key;
+      let letters;
+      let m;
+      let next;
+      let value;
+      if (arg !== "--" && /^-/.test(arg) && isUnknownOptionAsArg(arg)) {
+        pushPositional(arg);
+      } else if (truncatedArg.match(/^---+(=|$)/)) {
+        pushPositional(arg);
+        continue;
+      } else if (arg.match(/^--.+=/) || !configuration["short-option-groups"] && arg.match(/^-.+=/)) {
+        m = arg.match(/^--?([^=]+)=([\s\S]*)$/);
+        if (m !== null && Array.isArray(m) && m.length >= 3) {
+          if (checkAllAliases(m[1], flags.arrays)) {
+            i = eatArray(i, m[1], args, m[2]);
+          } else if (checkAllAliases(m[1], flags.nargs) !== false) {
+            i = eatNargs(i, m[1], args, m[2]);
+          } else {
+            setArg(m[1], m[2], true);
           }
-        } else if (arg.match(/^--.+/) || !configuration["short-option-groups"] && arg.match(/^-[^-]+/)) {
-          m2 = arg.match(/^--?(.+)/);
-          if (m2 !== null && Array.isArray(m2) && m2.length >= 2) {
-            key = m2[1];
-            if (checkAllAliases(key, flags.arrays)) {
-              i = eatArray(i, key, args);
-            } else if (checkAllAliases(key, flags.nargs) !== false) {
-              i = eatNargs(i, key, args);
-            } else {
-              next = args[i + 1];
-              if (next !== undefined && (!next.match(/^-/) || next.match(negative)) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
-                setArg(key, next);
-                i++;
-              } else if (/^(true|false)$/.test(next)) {
-                setArg(key, next);
-                i++;
-              } else {
-                setArg(key, defaultValue(key));
-              }
-            }
-          }
-        } else if (arg.match(/^-.\..+=/)) {
-          m2 = arg.match(/^-([^=]+)=([\s\S]*)$/);
-          if (m2 !== null && Array.isArray(m2) && m2.length >= 3) {
-            setArg(m2[1], m2[2]);
-          }
-        } else if (arg.match(/^-.\..+/) && !arg.match(negative)) {
-          next = args[i + 1];
-          m2 = arg.match(/^-(.\..+)/);
-          if (m2 !== null && Array.isArray(m2) && m2.length >= 2) {
-            key = m2[1];
-            if (next !== undefined && !next.match(/^-/) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
+        }
+      } else if (arg.match(negatedBoolean) && configuration["boolean-negation"]) {
+        m = arg.match(negatedBoolean);
+        if (m !== null && Array.isArray(m) && m.length >= 2) {
+          key = m[1];
+          setArg(key, checkAllAliases(key, flags.arrays) ? [false] : false);
+        }
+      } else if (arg.match(/^--.+/) || !configuration["short-option-groups"] && arg.match(/^-[^-]+/)) {
+        m = arg.match(/^--?(.+)/);
+        if (m !== null && Array.isArray(m) && m.length >= 2) {
+          key = m[1];
+          if (checkAllAliases(key, flags.arrays)) {
+            i = eatArray(i, key, args);
+          } else if (checkAllAliases(key, flags.nargs) !== false) {
+            i = eatNargs(i, key, args);
+          } else {
+            next = args[i + 1];
+            if (next !== undefined && (!next.match(/^-/) || next.match(negative)) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
+              setArg(key, next);
+              i++;
+            } else if (/^(true|false)$/.test(next)) {
               setArg(key, next);
               i++;
             } else {
               setArg(key, defaultValue(key));
             }
           }
-        } else if (arg.match(/^-[^-]+/) && !arg.match(negative)) {
-          letters = arg.slice(1, -1).split("");
-          broken = false;
-          for (let j = 0;j < letters.length; j++) {
-            next = arg.slice(j + 2);
-            if (letters[j + 1] && letters[j + 1] === "=") {
-              value = arg.slice(j + 3);
-              key = letters[j];
-              if (checkAllAliases(key, flags.arrays)) {
-                i = eatArray(i, key, args, value);
-              } else if (checkAllAliases(key, flags.nargs) !== false) {
-                i = eatNargs(i, key, args, value);
-              } else {
-                setArg(key, value);
-              }
-              broken = true;
-              break;
-            }
-            if (next === "-") {
-              setArg(letters[j], next);
-              continue;
-            }
-            if (/[A-Za-z]/.test(letters[j]) && /^-?\d+(\.\d*)?(e-?\d+)?$/.test(next) && checkAllAliases(next, flags.bools) === false) {
-              setArg(letters[j], next);
-              broken = true;
-              break;
-            }
-            if (letters[j + 1] && letters[j + 1].match(/\W/)) {
-              setArg(letters[j], next);
-              broken = true;
-              break;
-            } else {
-              setArg(letters[j], defaultValue(letters[j]));
-            }
-          }
-          key = arg.slice(-1)[0];
-          if (!broken && key !== "-") {
-            if (checkAllAliases(key, flags.arrays)) {
-              i = eatArray(i, key, args);
-            } else if (checkAllAliases(key, flags.nargs) !== false) {
-              i = eatNargs(i, key, args);
-            } else {
-              next = args[i + 1];
-              if (next !== undefined && (!/^(-|--)[^-]/.test(next) || next.match(negative)) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
-                setArg(key, next);
-                i++;
-              } else if (/^(true|false)$/.test(next)) {
-                setArg(key, next);
-                i++;
-              } else {
-                setArg(key, defaultValue(key));
-              }
-            }
-          }
-        } else if (arg.match(/^-[0-9]$/) && arg.match(negative) && checkAllAliases(arg.slice(1), flags.bools)) {
-          key = arg.slice(1);
-          setArg(key, defaultValue(key));
-        } else if (arg === "--") {
-          notFlags = args.slice(i + 1);
-          break;
-        } else if (configuration["halt-at-non-option"]) {
-          notFlags = args.slice(i);
-          break;
-        } else {
-          pushPositional(arg);
         }
-      }
-      applyEnvVars(argv, true);
-      applyEnvVars(argv, false);
-      setConfig(argv);
-      setConfigObjects();
-      applyDefaultsAndAliases(argv, flags.aliases, defaults, true);
-      applyCoercions(argv);
-      if (configuration["set-placeholder-key"])
-        setPlaceholderKeys(argv);
-      Object.keys(flags.counts).forEach(function(key) {
-        if (!hasKey(argv, key.split(".")))
-          setArg(key, 0);
-      });
-      if (notFlagsOption && notFlags.length)
-        argv[notFlagsArgv] = [];
-      notFlags.forEach(function(key) {
-        argv[notFlagsArgv].push(key);
-      });
-      if (configuration["camel-case-expansion"] && configuration["strip-dashed"]) {
-        Object.keys(argv).filter((key) => key !== "--" && key.includes("-")).forEach((key) => {
-          delete argv[key];
-        });
-      }
-      if (configuration["strip-aliased"]) {
-        [].concat(...Object.keys(aliases).map((k) => aliases[k])).forEach((alias) => {
-          if (configuration["camel-case-expansion"] && alias.includes("-")) {
-            delete argv[alias.split(".").map((prop) => camelCase2(prop)).join(".")];
-          }
-          delete argv[alias];
-        });
-      }
-      function pushPositional(arg) {
-        const maybeCoercedNumber = maybeCoerceNumber("_", arg);
-        if (typeof maybeCoercedNumber === "string" || typeof maybeCoercedNumber === "number") {
-          argv._.push(maybeCoercedNumber);
+      } else if (arg.match(/^-.\..+=/)) {
+        m = arg.match(/^-([^=]+)=([\s\S]*)$/);
+        if (m !== null && Array.isArray(m) && m.length >= 3) {
+          setArg(m[1], m[2]);
         }
-      }
-      function eatNargs(i, key, args2, argAfterEqualSign) {
-        let ii;
-        let toEat = checkAllAliases(key, flags.nargs);
-        toEat = typeof toEat !== "number" || isNaN(toEat) ? 1 : toEat;
-        if (toEat === 0) {
-          if (!isUndefined(argAfterEqualSign)) {
-            error = Error(__("Argument unexpected for: %s", key));
-          }
-          setArg(key, defaultValue(key));
-          return i;
-        }
-        let available = isUndefined(argAfterEqualSign) ? 0 : 1;
-        if (configuration["nargs-eats-options"]) {
-          if (args2.length - (i + 1) + available < toEat) {
-            error = Error(__("Not enough arguments following: %s", key));
-          }
-          available = toEat;
-        } else {
-          for (ii = i + 1;ii < args2.length; ii++) {
-            if (!args2[ii].match(/^-[^0-9]/) || args2[ii].match(negative) || isUnknownOptionAsArg(args2[ii]))
-              available++;
-            else
-              break;
-          }
-          if (available < toEat)
-            error = Error(__("Not enough arguments following: %s", key));
-        }
-        let consumed = Math.min(available, toEat);
-        if (!isUndefined(argAfterEqualSign) && consumed > 0) {
-          setArg(key, argAfterEqualSign);
-          consumed--;
-        }
-        for (ii = i + 1;ii < consumed + i + 1; ii++) {
-          setArg(key, args2[ii]);
-        }
-        return i + consumed;
-      }
-      function eatArray(i, key, args2, argAfterEqualSign) {
-        let argsToSet = [];
-        let next = argAfterEqualSign || args2[i + 1];
-        const nargsCount = checkAllAliases(key, flags.nargs);
-        if (checkAllAliases(key, flags.bools) && !/^(true|false)$/.test(next)) {
-          argsToSet.push(true);
-        } else if (isUndefined(next) || isUndefined(argAfterEqualSign) && /^-/.test(next) && !negative.test(next) && !isUnknownOptionAsArg(next)) {
-          if (defaults[key] !== undefined) {
-            const defVal = defaults[key];
-            argsToSet = Array.isArray(defVal) ? defVal : [defVal];
-          }
-        } else {
-          if (!isUndefined(argAfterEqualSign)) {
-            argsToSet.push(processValue(key, argAfterEqualSign, true));
-          }
-          for (let ii = i + 1;ii < args2.length; ii++) {
-            if (!configuration["greedy-arrays"] && argsToSet.length > 0 || nargsCount && typeof nargsCount === "number" && argsToSet.length >= nargsCount)
-              break;
-            next = args2[ii];
-            if (/^-/.test(next) && !negative.test(next) && !isUnknownOptionAsArg(next))
-              break;
-            i = ii;
-            argsToSet.push(processValue(key, next, inputIsString));
-          }
-        }
-        if (typeof nargsCount === "number" && (nargsCount && argsToSet.length < nargsCount || isNaN(nargsCount) && argsToSet.length === 0)) {
-          error = Error(__("Not enough arguments following: %s", key));
-        }
-        setArg(key, argsToSet);
-        return i;
-      }
-      function setArg(key, val, shouldStripQuotes = inputIsString) {
-        if (/-/.test(key) && configuration["camel-case-expansion"]) {
-          const alias = key.split(".").map(function(prop) {
-            return camelCase2(prop);
-          }).join(".");
-          addNewAlias(key, alias);
-        }
-        const value = processValue(key, val, shouldStripQuotes);
-        const splitKey = key.split(".");
-        setKey(argv, splitKey, value);
-        if (flags.aliases[key]) {
-          flags.aliases[key].forEach(function(x) {
-            const keyProperties = x.split(".");
-            setKey(argv, keyProperties, value);
-          });
-        }
-        if (splitKey.length > 1 && configuration["dot-notation"]) {
-          (flags.aliases[splitKey[0]] || []).forEach(function(x) {
-            let keyProperties = x.split(".");
-            const a = [].concat(splitKey);
-            a.shift();
-            keyProperties = keyProperties.concat(a);
-            if (!(flags.aliases[key] || []).includes(keyProperties.join("."))) {
-              setKey(argv, keyProperties, value);
-            }
-          });
-        }
-        if (checkAllAliases(key, flags.normalize) && !checkAllAliases(key, flags.arrays)) {
-          const keys = [key].concat(flags.aliases[key] || []);
-          keys.forEach(function(key2) {
-            Object.defineProperty(argvReturn, key2, {
-              enumerable: true,
-              get() {
-                return val;
-              },
-              set(value2) {
-                val = typeof value2 === "string" ? mixin.normalize(value2) : value2;
-              }
-            });
-          });
-        }
-      }
-      function addNewAlias(key, alias) {
-        if (!(flags.aliases[key] && flags.aliases[key].length)) {
-          flags.aliases[key] = [alias];
-          newAliases[alias] = true;
-        }
-        if (!(flags.aliases[alias] && flags.aliases[alias].length)) {
-          addNewAlias(alias, key);
-        }
-      }
-      function processValue(key, val, shouldStripQuotes) {
-        if (shouldStripQuotes) {
-          val = stripQuotes(val);
-        }
-        if (checkAllAliases(key, flags.bools) || checkAllAliases(key, flags.counts)) {
-          if (typeof val === "string")
-            val = val === "true";
-        }
-        let value = Array.isArray(val) ? val.map(function(v) {
-          return maybeCoerceNumber(key, v);
-        }) : maybeCoerceNumber(key, val);
-        if (checkAllAliases(key, flags.counts) && (isUndefined(value) || typeof value === "boolean")) {
-          value = increment();
-        }
-        if (checkAllAliases(key, flags.normalize) && checkAllAliases(key, flags.arrays)) {
-          if (Array.isArray(val))
-            value = val.map((val2) => {
-              return mixin.normalize(val2);
-            });
-          else
-            value = mixin.normalize(val);
-        }
-        return value;
-      }
-      function maybeCoerceNumber(key, value) {
-        if (!configuration["parse-positional-numbers"] && key === "_")
-          return value;
-        if (!checkAllAliases(key, flags.strings) && !checkAllAliases(key, flags.bools) && !Array.isArray(value)) {
-          const shouldCoerceNumber = looksLikeNumber(value) && configuration["parse-numbers"] && Number.isSafeInteger(Math.floor(parseFloat(`${value}`)));
-          if (shouldCoerceNumber || !isUndefined(value) && checkAllAliases(key, flags.numbers)) {
-            value = Number(value);
-          }
-        }
-        return value;
-      }
-      function setConfig(argv2) {
-        const configLookup = Object.create(null);
-        applyDefaultsAndAliases(configLookup, flags.aliases, defaults);
-        Object.keys(flags.configs).forEach(function(configKey) {
-          const configPath = argv2[configKey] || configLookup[configKey];
-          if (configPath) {
-            try {
-              let config = null;
-              const resolvedConfigPath = mixin.resolve(mixin.cwd(), configPath);
-              const resolveConfig = flags.configs[configKey];
-              if (typeof resolveConfig === "function") {
-                try {
-                  config = resolveConfig(resolvedConfigPath);
-                } catch (e) {
-                  config = e;
-                }
-                if (config instanceof Error) {
-                  error = config;
-                  return;
-                }
-              } else {
-                config = mixin.require(resolvedConfigPath);
-              }
-              setConfigObject(config);
-            } catch (ex) {
-              if (ex.name === "PermissionDenied")
-                error = ex;
-              else if (argv2[configKey])
-                error = Error(__("Invalid JSON config file: %s", configPath));
-            }
-          }
-        });
-      }
-      function setConfigObject(config, prev) {
-        Object.keys(config).forEach(function(key) {
-          const value = config[key];
-          const fullKey = prev ? prev + "." + key : key;
-          if (typeof value === "object" && value !== null && !Array.isArray(value) && configuration["dot-notation"]) {
-            setConfigObject(value, fullKey);
+      } else if (arg.match(/^-.\..+/) && !arg.match(negative)) {
+        next = args[i + 1];
+        m = arg.match(/^-(.\..+)/);
+        if (m !== null && Array.isArray(m) && m.length >= 2) {
+          key = m[1];
+          if (next !== undefined && !next.match(/^-/) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
+            setArg(key, next);
+            i++;
           } else {
-            if (!hasKey(argv, fullKey.split(".")) || checkAllAliases(fullKey, flags.arrays) && configuration["combine-arrays"]) {
-              setArg(fullKey, value);
-            }
-          }
-        });
-      }
-      function setConfigObjects() {
-        if (typeof configObjects !== "undefined") {
-          configObjects.forEach(function(configObject) {
-            setConfigObject(configObject);
-          });
-        }
-      }
-      function applyEnvVars(argv2, configOnly) {
-        if (typeof envPrefix === "undefined")
-          return;
-        const prefix = typeof envPrefix === "string" ? envPrefix : "";
-        const env2 = mixin.env();
-        Object.keys(env2).forEach(function(envVar) {
-          if (prefix === "" || envVar.lastIndexOf(prefix, 0) === 0) {
-            const keys = envVar.split("__").map(function(key, i) {
-              if (i === 0) {
-                key = key.substring(prefix.length);
-              }
-              return camelCase2(key);
-            });
-            if ((configOnly && flags.configs[keys.join(".")] || !configOnly) && !hasKey(argv2, keys)) {
-              setArg(keys.join("."), env2[envVar]);
-            }
-          }
-        });
-      }
-      function applyCoercions(argv2) {
-        let coerce2;
-        const applied = new Set;
-        Object.keys(argv2).forEach(function(key) {
-          if (!applied.has(key)) {
-            coerce2 = checkAllAliases(key, flags.coercions);
-            if (typeof coerce2 === "function") {
-              try {
-                const value = maybeCoerceNumber(key, coerce2(argv2[key]));
-                [].concat(flags.aliases[key] || [], key).forEach((ali) => {
-                  applied.add(ali);
-                  argv2[ali] = value;
-                });
-              } catch (err) {
-                error = err;
-              }
-            }
-          }
-        });
-      }
-      function setPlaceholderKeys(argv2) {
-        flags.keys.forEach((key) => {
-          if (~key.indexOf("."))
-            return;
-          if (typeof argv2[key] === "undefined")
-            argv2[key] = undefined;
-        });
-        return argv2;
-      }
-      function applyDefaultsAndAliases(obj, aliases2, defaults2, canLog = false) {
-        Object.keys(defaults2).forEach(function(key) {
-          if (!hasKey(obj, key.split("."))) {
-            setKey(obj, key.split("."), defaults2[key]);
-            if (canLog)
-              defaulted[key] = true;
-            (aliases2[key] || []).forEach(function(x) {
-              if (hasKey(obj, x.split(".")))
-                return;
-              setKey(obj, x.split("."), defaults2[key]);
-            });
-          }
-        });
-      }
-      function hasKey(obj, keys) {
-        let o = obj;
-        if (!configuration["dot-notation"])
-          keys = [keys.join(".")];
-        keys.slice(0, -1).forEach(function(key2) {
-          o = o[key2] || {};
-        });
-        const key = keys[keys.length - 1];
-        if (typeof o !== "object")
-          return false;
-        else
-          return key in o;
-      }
-      function setKey(obj, keys, value) {
-        let o = obj;
-        if (!configuration["dot-notation"])
-          keys = [keys.join(".")];
-        keys.slice(0, -1).forEach(function(key2) {
-          key2 = sanitizeKey(key2);
-          if (typeof o === "object" && o[key2] === undefined) {
-            o[key2] = {};
-          }
-          if (typeof o[key2] !== "object" || Array.isArray(o[key2])) {
-            if (Array.isArray(o[key2])) {
-              o[key2].push({});
-            } else {
-              o[key2] = [o[key2], {}];
-            }
-            o = o[key2][o[key2].length - 1];
-          } else {
-            o = o[key2];
-          }
-        });
-        const key = sanitizeKey(keys[keys.length - 1]);
-        const isTypeArray = checkAllAliases(keys.join("."), flags.arrays);
-        const isValueArray = Array.isArray(value);
-        let duplicate = configuration["duplicate-arguments-array"];
-        if (!duplicate && checkAllAliases(key, flags.nargs)) {
-          duplicate = true;
-          if (!isUndefined(o[key]) && flags.nargs[key] === 1 || Array.isArray(o[key]) && o[key].length === flags.nargs[key]) {
-            o[key] = undefined;
+            setArg(key, defaultValue(key));
           }
         }
-        if (value === increment()) {
-          o[key] = increment(o[key]);
-        } else if (Array.isArray(o[key])) {
-          if (duplicate && isTypeArray && isValueArray) {
-            o[key] = configuration["flatten-duplicate-arrays"] ? o[key].concat(value) : (Array.isArray(o[key][0]) ? o[key] : [o[key]]).concat([value]);
-          } else if (!duplicate && Boolean(isTypeArray) === Boolean(isValueArray)) {
-            o[key] = value;
-          } else {
-            o[key] = o[key].concat([value]);
-          }
-        } else if (o[key] === undefined && isTypeArray) {
-          o[key] = isValueArray ? value : [value];
-        } else if (duplicate && !(o[key] === undefined || checkAllAliases(key, flags.counts) || checkAllAliases(key, flags.bools))) {
-          o[key] = [o[key], value];
-        } else {
-          o[key] = value;
-        }
-      }
-      function extendAliases(...args2) {
-        args2.forEach(function(obj) {
-          Object.keys(obj || {}).forEach(function(key) {
-            if (flags.aliases[key])
-              return;
-            flags.aliases[key] = [].concat(aliases[key] || []);
-            flags.aliases[key].concat(key).forEach(function(x) {
-              if (/-/.test(x) && configuration["camel-case-expansion"]) {
-                const c = camelCase2(x);
-                if (c !== key && flags.aliases[key].indexOf(c) === -1) {
-                  flags.aliases[key].push(c);
-                  newAliases[c] = true;
-                }
-              }
-            });
-            flags.aliases[key].concat(key).forEach(function(x) {
-              if (x.length > 1 && /[A-Z]/.test(x) && configuration["camel-case-expansion"]) {
-                const c = decamelize(x, "-");
-                if (c !== key && flags.aliases[key].indexOf(c) === -1) {
-                  flags.aliases[key].push(c);
-                  newAliases[c] = true;
-                }
-              }
-            });
-            flags.aliases[key].forEach(function(x) {
-              flags.aliases[x] = [key].concat(flags.aliases[key].filter(function(y2) {
-                return x !== y2;
-              }));
-            });
-          });
-        });
-      }
-      function checkAllAliases(key, flag) {
-        const toCheck = [].concat(flags.aliases[key] || [], key);
-        const keys = Object.keys(flag);
-        const setAlias = toCheck.find((key2) => keys.includes(key2));
-        return setAlias ? flag[setAlias] : false;
-      }
-      function hasAnyFlag(key) {
-        const flagsKeys = Object.keys(flags);
-        const toCheck = [].concat(flagsKeys.map((k) => flags[k]));
-        return toCheck.some(function(flag) {
-          return Array.isArray(flag) ? flag.includes(key) : flag[key];
-        });
-      }
-      function hasFlagsMatching(arg, ...patterns) {
-        const toCheck = [].concat(...patterns);
-        return toCheck.some(function(pattern) {
-          const match = arg.match(pattern);
-          return match && hasAnyFlag(match[1]);
-        });
-      }
-      function hasAllShortFlags(arg) {
-        if (arg.match(negative) || !arg.match(/^-[^-]+/)) {
-          return false;
-        }
-        let hasAllFlags = true;
-        let next;
-        const letters = arg.slice(1).split("");
+      } else if (arg.match(/^-[^-]+/) && !arg.match(negative)) {
+        letters = arg.slice(1, -1).split("");
+        broken = false;
         for (let j = 0;j < letters.length; j++) {
           next = arg.slice(j + 2);
-          if (!hasAnyFlag(letters[j])) {
-            hasAllFlags = false;
+          if (letters[j + 1] && letters[j + 1] === "=") {
+            value = arg.slice(j + 3);
+            key = letters[j];
+            if (checkAllAliases(key, flags.arrays)) {
+              i = eatArray(i, key, args, value);
+            } else if (checkAllAliases(key, flags.nargs) !== false) {
+              i = eatNargs(i, key, args, value);
+            } else {
+              setArg(key, value);
+            }
+            broken = true;
             break;
           }
-          if (letters[j + 1] && letters[j + 1] === "=" || next === "-" || /[A-Za-z]/.test(letters[j]) && /^-?\d+(\.\d*)?(e-?\d+)?$/.test(next) || letters[j + 1] && letters[j + 1].match(/\W/)) {
+          if (next === "-") {
+            setArg(letters[j], next);
+            continue;
+          }
+          if (/[A-Za-z]/.test(letters[j]) && /^-?\d+(\.\d*)?(e-?\d+)?$/.test(next) && checkAllAliases(next, flags.bools) === false) {
+            setArg(letters[j], next);
+            broken = true;
             break;
           }
+          if (letters[j + 1] && letters[j + 1].match(/\W/)) {
+            setArg(letters[j], next);
+            broken = true;
+            break;
+          } else {
+            setArg(letters[j], defaultValue(letters[j]));
+          }
         }
-        return hasAllFlags;
-      }
-      function isUnknownOptionAsArg(arg) {
-        return configuration["unknown-options-as-args"] && isUnknownOption(arg);
-      }
-      function isUnknownOption(arg) {
-        arg = arg.replace(/^-{3,}/, "--");
-        if (arg.match(negative)) {
-          return false;
-        }
-        if (hasAllShortFlags(arg)) {
-          return false;
-        }
-        const flagWithEquals = /^-+([^=]+?)=[\s\S]*$/;
-        const normalFlag = /^-+([^=]+?)$/;
-        const flagEndingInHyphen = /^-+([^=]+?)-$/;
-        const flagEndingInDigits = /^-+([^=]+?\d+)$/;
-        const flagEndingInNonWordCharacters = /^-+([^=]+?)\W+.*$/;
-        return !hasFlagsMatching(arg, flagWithEquals, negatedBoolean, normalFlag, flagEndingInHyphen, flagEndingInDigits, flagEndingInNonWordCharacters);
-      }
-      function defaultValue(key) {
-        if (!checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts) && `${key}` in defaults) {
-          return defaults[key];
-        } else {
-          return defaultForType(guessType(key));
-        }
-      }
-      function defaultForType(type) {
-        const def = {
-          [DefaultValuesForTypeKey.BOOLEAN]: true,
-          [DefaultValuesForTypeKey.STRING]: "",
-          [DefaultValuesForTypeKey.NUMBER]: undefined,
-          [DefaultValuesForTypeKey.ARRAY]: []
-        };
-        return def[type];
-      }
-      function guessType(key) {
-        let type = DefaultValuesForTypeKey.BOOLEAN;
-        if (checkAllAliases(key, flags.strings))
-          type = DefaultValuesForTypeKey.STRING;
-        else if (checkAllAliases(key, flags.numbers))
-          type = DefaultValuesForTypeKey.NUMBER;
-        else if (checkAllAliases(key, flags.bools))
-          type = DefaultValuesForTypeKey.BOOLEAN;
-        else if (checkAllAliases(key, flags.arrays))
-          type = DefaultValuesForTypeKey.ARRAY;
-        return type;
-      }
-      function isUndefined(num) {
-        return num === undefined;
-      }
-      function checkConfiguration() {
-        Object.keys(flags.counts).find((key) => {
+        key = arg.slice(-1)[0];
+        if (!broken && key !== "-") {
           if (checkAllAliases(key, flags.arrays)) {
-            error = Error(__("Invalid configuration: %s, opts.count excludes opts.array.", key));
-            return true;
-          } else if (checkAllAliases(key, flags.nargs)) {
-            error = Error(__("Invalid configuration: %s, opts.count excludes opts.narg.", key));
-            return true;
+            i = eatArray(i, key, args);
+          } else if (checkAllAliases(key, flags.nargs) !== false) {
+            i = eatNargs(i, key, args);
+          } else {
+            next = args[i + 1];
+            if (next !== undefined && (!/^(-|--)[^-]/.test(next) || next.match(negative)) && !checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts)) {
+              setArg(key, next);
+              i++;
+            } else if (/^(true|false)$/.test(next)) {
+              setArg(key, next);
+              i++;
+            } else {
+              setArg(key, defaultValue(key));
+            }
           }
-          return false;
+        }
+      } else if (arg.match(/^-[0-9]$/) && arg.match(negative) && checkAllAliases(arg.slice(1), flags.bools)) {
+        key = arg.slice(1);
+        setArg(key, defaultValue(key));
+      } else if (arg === "--") {
+        notFlags = args.slice(i + 1);
+        break;
+      } else if (configuration["halt-at-non-option"]) {
+        notFlags = args.slice(i);
+        break;
+      } else {
+        pushPositional(arg);
+      }
+    }
+    applyEnvVars(argv, true);
+    applyEnvVars(argv, false);
+    setConfig(argv);
+    setConfigObjects();
+    applyDefaultsAndAliases(argv, flags.aliases, defaults, true);
+    applyCoercions(argv);
+    if (configuration["set-placeholder-key"])
+      setPlaceholderKeys(argv);
+    Object.keys(flags.counts).forEach(function(key) {
+      if (!hasKey(argv, key.split(".")))
+        setArg(key, 0);
+    });
+    if (notFlagsOption && notFlags.length)
+      argv[notFlagsArgv] = [];
+    notFlags.forEach(function(key) {
+      argv[notFlagsArgv].push(key);
+    });
+    if (configuration["camel-case-expansion"] && configuration["strip-dashed"]) {
+      Object.keys(argv).filter((key) => key !== "--" && key.includes("-")).forEach((key) => {
+        delete argv[key];
+      });
+    }
+    if (configuration["strip-aliased"]) {
+      [].concat(...Object.keys(aliases).map((k) => aliases[k])).forEach((alias) => {
+        if (configuration["camel-case-expansion"] && alias.includes("-")) {
+          delete argv[alias.split(".").map((prop) => camelCase(prop)).join(".")];
+        }
+        delete argv[alias];
+      });
+    }
+    function pushPositional(arg) {
+      const maybeCoercedNumber = maybeCoerceNumber("_", arg);
+      if (typeof maybeCoercedNumber === "string" || typeof maybeCoercedNumber === "number") {
+        argv._.push(maybeCoercedNumber);
+      }
+    }
+    function eatNargs(i, key, args2, argAfterEqualSign) {
+      let ii;
+      let toEat = checkAllAliases(key, flags.nargs);
+      toEat = typeof toEat !== "number" || isNaN(toEat) ? 1 : toEat;
+      if (toEat === 0) {
+        if (!isUndefined(argAfterEqualSign)) {
+          error = Error(__("Argument unexpected for: %s", key));
+        }
+        setArg(key, defaultValue(key));
+        return i;
+      }
+      let available = isUndefined(argAfterEqualSign) ? 0 : 1;
+      if (configuration["nargs-eats-options"]) {
+        if (args2.length - (i + 1) + available < toEat) {
+          error = Error(__("Not enough arguments following: %s", key));
+        }
+        available = toEat;
+      } else {
+        for (ii = i + 1;ii < args2.length; ii++) {
+          if (!args2[ii].match(/^-[^0-9]/) || args2[ii].match(negative) || isUnknownOptionAsArg(args2[ii]))
+            available++;
+          else
+            break;
+        }
+        if (available < toEat)
+          error = Error(__("Not enough arguments following: %s", key));
+      }
+      let consumed = Math.min(available, toEat);
+      if (!isUndefined(argAfterEqualSign) && consumed > 0) {
+        setArg(key, argAfterEqualSign);
+        consumed--;
+      }
+      for (ii = i + 1;ii < consumed + i + 1; ii++) {
+        setArg(key, args2[ii]);
+      }
+      return i + consumed;
+    }
+    function eatArray(i, key, args2, argAfterEqualSign) {
+      let argsToSet = [];
+      let next = argAfterEqualSign || args2[i + 1];
+      const nargsCount = checkAllAliases(key, flags.nargs);
+      if (checkAllAliases(key, flags.bools) && !/^(true|false)$/.test(next)) {
+        argsToSet.push(true);
+      } else if (isUndefined(next) || isUndefined(argAfterEqualSign) && /^-/.test(next) && !negative.test(next) && !isUnknownOptionAsArg(next)) {
+        if (defaults[key] !== undefined) {
+          const defVal = defaults[key];
+          argsToSet = Array.isArray(defVal) ? defVal : [defVal];
+        }
+      } else {
+        if (!isUndefined(argAfterEqualSign)) {
+          argsToSet.push(processValue(key, argAfterEqualSign, true));
+        }
+        for (let ii = i + 1;ii < args2.length; ii++) {
+          if (!configuration["greedy-arrays"] && argsToSet.length > 0 || nargsCount && typeof nargsCount === "number" && argsToSet.length >= nargsCount)
+            break;
+          next = args2[ii];
+          if (/^-/.test(next) && !negative.test(next) && !isUnknownOptionAsArg(next))
+            break;
+          i = ii;
+          argsToSet.push(processValue(key, next, inputIsString));
+        }
+      }
+      if (typeof nargsCount === "number" && (nargsCount && argsToSet.length < nargsCount || isNaN(nargsCount) && argsToSet.length === 0)) {
+        error = Error(__("Not enough arguments following: %s", key));
+      }
+      setArg(key, argsToSet);
+      return i;
+    }
+    function setArg(key, val, shouldStripQuotes = inputIsString) {
+      if (/-/.test(key) && configuration["camel-case-expansion"]) {
+        const alias = key.split(".").map(function(prop) {
+          return camelCase(prop);
+        }).join(".");
+        addNewAlias(key, alias);
+      }
+      const value = processValue(key, val, shouldStripQuotes);
+      const splitKey = key.split(".");
+      setKey(argv, splitKey, value);
+      if (flags.aliases[key]) {
+        flags.aliases[key].forEach(function(x) {
+          const keyProperties = x.split(".");
+          setKey(argv, keyProperties, value);
         });
       }
-      return {
-        aliases: Object.assign({}, flags.aliases),
-        argv: Object.assign(argvReturn, argv),
-        configuration,
-        defaulted: Object.assign({}, defaulted),
-        error,
-        newAliases: Object.assign({}, newAliases)
-      };
-    }
-  }
-  var _a;
-  var _b;
-  var _c;
-  var minNodeVersion = process && process.env && process.env.YARGS_MIN_NODE_VERSION ? Number(process.env.YARGS_MIN_NODE_VERSION) : 12;
-  var nodeVersion = (_b = (_a = process === null || process === undefined ? undefined : process.versions) === null || _a === undefined ? undefined : _a.node) !== null && _b !== undefined ? _b : (_c = process === null || process === undefined ? undefined : process.version) === null || _c === undefined ? undefined : _c.slice(1);
-  if (nodeVersion) {
-    const major = Number(nodeVersion.match(/^([^.]+)/)[1]);
-    if (major < minNodeVersion) {
-      throw Error(`yargs parser supports a minimum Node.js version of ${minNodeVersion}. Read our version support policy: https://github.com/yargs/yargs-parser#supported-nodejs-versions`);
-    }
-  }
-  var env = process ? process.env : {};
-  var parser = new YargsParser({
-    cwd: process.cwd,
-    env: () => {
-      return env;
-    },
-    format: util2.format,
-    normalize: path.normalize,
-    resolve: path.resolve,
-    require: (path2) => {
-      if (typeof __require !== "undefined") {
-        return __require(path2);
-      } else if (path2.match(/\.json$/)) {
-        return JSON.parse(fs.readFileSync(path2, "utf8"));
-      } else {
-        throw Error("only .json config files are supported in ESM");
+      if (splitKey.length > 1 && configuration["dot-notation"]) {
+        (flags.aliases[splitKey[0]] || []).forEach(function(x) {
+          let keyProperties = x.split(".");
+          const a = [].concat(splitKey);
+          a.shift();
+          keyProperties = keyProperties.concat(a);
+          if (!(flags.aliases[key] || []).includes(keyProperties.join("."))) {
+            setKey(argv, keyProperties, value);
+          }
+        });
+      }
+      if (checkAllAliases(key, flags.normalize) && !checkAllAliases(key, flags.arrays)) {
+        const keys = [key].concat(flags.aliases[key] || []);
+        keys.forEach(function(key2) {
+          Object.defineProperty(argvReturn, key2, {
+            enumerable: true,
+            get() {
+              return val;
+            },
+            set(value2) {
+              val = typeof value2 === "string" ? mixin.normalize(value2) : value2;
+            }
+          });
+        });
       }
     }
-  });
-  var yargsParser = function Parser(args, opts) {
-    const result = parser.parse(args.slice(), opts);
-    return result.argv;
-  };
-  yargsParser.detailed = function(args, opts) {
-    return parser.parse(args.slice(), opts);
-  };
-  yargsParser.camelCase = camelCase2;
-  yargsParser.decamelize = decamelize;
-  yargsParser.looksLikeNumber = looksLikeNumber;
-  module.exports = yargsParser;
+    function addNewAlias(key, alias) {
+      if (!(flags.aliases[key] && flags.aliases[key].length)) {
+        flags.aliases[key] = [alias];
+        newAliases[alias] = true;
+      }
+      if (!(flags.aliases[alias] && flags.aliases[alias].length)) {
+        addNewAlias(alias, key);
+      }
+    }
+    function processValue(key, val, shouldStripQuotes) {
+      if (shouldStripQuotes) {
+        val = stripQuotes(val);
+      }
+      if (checkAllAliases(key, flags.bools) || checkAllAliases(key, flags.counts)) {
+        if (typeof val === "string")
+          val = val === "true";
+      }
+      let value = Array.isArray(val) ? val.map(function(v) {
+        return maybeCoerceNumber(key, v);
+      }) : maybeCoerceNumber(key, val);
+      if (checkAllAliases(key, flags.counts) && (isUndefined(value) || typeof value === "boolean")) {
+        value = increment();
+      }
+      if (checkAllAliases(key, flags.normalize) && checkAllAliases(key, flags.arrays)) {
+        if (Array.isArray(val))
+          value = val.map((val2) => {
+            return mixin.normalize(val2);
+          });
+        else
+          value = mixin.normalize(val);
+      }
+      return value;
+    }
+    function maybeCoerceNumber(key, value) {
+      if (!configuration["parse-positional-numbers"] && key === "_")
+        return value;
+      if (!checkAllAliases(key, flags.strings) && !checkAllAliases(key, flags.bools) && !Array.isArray(value)) {
+        const shouldCoerceNumber = looksLikeNumber(value) && configuration["parse-numbers"] && Number.isSafeInteger(Math.floor(parseFloat(`${value}`)));
+        if (shouldCoerceNumber || !isUndefined(value) && checkAllAliases(key, flags.numbers)) {
+          value = Number(value);
+        }
+      }
+      return value;
+    }
+    function setConfig(argv2) {
+      const configLookup = Object.create(null);
+      applyDefaultsAndAliases(configLookup, flags.aliases, defaults);
+      Object.keys(flags.configs).forEach(function(configKey) {
+        const configPath = argv2[configKey] || configLookup[configKey];
+        if (configPath) {
+          try {
+            let config = null;
+            const resolvedConfigPath = mixin.resolve(mixin.cwd(), configPath);
+            const resolveConfig = flags.configs[configKey];
+            if (typeof resolveConfig === "function") {
+              try {
+                config = resolveConfig(resolvedConfigPath);
+              } catch (e) {
+                config = e;
+              }
+              if (config instanceof Error) {
+                error = config;
+                return;
+              }
+            } else {
+              config = mixin.require(resolvedConfigPath);
+            }
+            setConfigObject(config);
+          } catch (ex) {
+            if (ex.name === "PermissionDenied")
+              error = ex;
+            else if (argv2[configKey])
+              error = Error(__("Invalid JSON config file: %s", configPath));
+          }
+        }
+      });
+    }
+    function setConfigObject(config, prev) {
+      Object.keys(config).forEach(function(key) {
+        const value = config[key];
+        const fullKey = prev ? prev + "." + key : key;
+        if (typeof value === "object" && value !== null && !Array.isArray(value) && configuration["dot-notation"]) {
+          setConfigObject(value, fullKey);
+        } else {
+          if (!hasKey(argv, fullKey.split(".")) || checkAllAliases(fullKey, flags.arrays) && configuration["combine-arrays"]) {
+            setArg(fullKey, value);
+          }
+        }
+      });
+    }
+    function setConfigObjects() {
+      if (typeof configObjects !== "undefined") {
+        configObjects.forEach(function(configObject) {
+          setConfigObject(configObject);
+        });
+      }
+    }
+    function applyEnvVars(argv2, configOnly) {
+      if (typeof envPrefix === "undefined")
+        return;
+      const prefix = typeof envPrefix === "string" ? envPrefix : "";
+      const env = mixin.env();
+      Object.keys(env).forEach(function(envVar) {
+        if (prefix === "" || envVar.lastIndexOf(prefix, 0) === 0) {
+          const keys = envVar.split("__").map(function(key, i) {
+            if (i === 0) {
+              key = key.substring(prefix.length);
+            }
+            return camelCase(key);
+          });
+          if ((configOnly && flags.configs[keys.join(".")] || !configOnly) && !hasKey(argv2, keys)) {
+            setArg(keys.join("."), env[envVar]);
+          }
+        }
+      });
+    }
+    function applyCoercions(argv2) {
+      let coerce;
+      const applied = new Set;
+      Object.keys(argv2).forEach(function(key) {
+        if (!applied.has(key)) {
+          coerce = checkAllAliases(key, flags.coercions);
+          if (typeof coerce === "function") {
+            try {
+              const value = maybeCoerceNumber(key, coerce(argv2[key]));
+              [].concat(flags.aliases[key] || [], key).forEach((ali) => {
+                applied.add(ali);
+                argv2[ali] = value;
+              });
+            } catch (err) {
+              error = err;
+            }
+          }
+        }
+      });
+    }
+    function setPlaceholderKeys(argv2) {
+      flags.keys.forEach((key) => {
+        if (~key.indexOf("."))
+          return;
+        if (typeof argv2[key] === "undefined")
+          argv2[key] = undefined;
+      });
+      return argv2;
+    }
+    function applyDefaultsAndAliases(obj, aliases2, defaults2, canLog = false) {
+      Object.keys(defaults2).forEach(function(key) {
+        if (!hasKey(obj, key.split("."))) {
+          setKey(obj, key.split("."), defaults2[key]);
+          if (canLog)
+            defaulted[key] = true;
+          (aliases2[key] || []).forEach(function(x) {
+            if (hasKey(obj, x.split(".")))
+              return;
+            setKey(obj, x.split("."), defaults2[key]);
+          });
+        }
+      });
+    }
+    function hasKey(obj, keys) {
+      let o = obj;
+      if (!configuration["dot-notation"])
+        keys = [keys.join(".")];
+      keys.slice(0, -1).forEach(function(key2) {
+        o = o[key2] || {};
+      });
+      const key = keys[keys.length - 1];
+      if (typeof o !== "object")
+        return false;
+      else
+        return key in o;
+    }
+    function setKey(obj, keys, value) {
+      let o = obj;
+      if (!configuration["dot-notation"])
+        keys = [keys.join(".")];
+      keys.slice(0, -1).forEach(function(key2) {
+        key2 = sanitizeKey(key2);
+        if (typeof o === "object" && o[key2] === undefined) {
+          o[key2] = {};
+        }
+        if (typeof o[key2] !== "object" || Array.isArray(o[key2])) {
+          if (Array.isArray(o[key2])) {
+            o[key2].push({});
+          } else {
+            o[key2] = [o[key2], {}];
+          }
+          o = o[key2][o[key2].length - 1];
+        } else {
+          o = o[key2];
+        }
+      });
+      const key = sanitizeKey(keys[keys.length - 1]);
+      const isTypeArray = checkAllAliases(keys.join("."), flags.arrays);
+      const isValueArray = Array.isArray(value);
+      let duplicate = configuration["duplicate-arguments-array"];
+      if (!duplicate && checkAllAliases(key, flags.nargs)) {
+        duplicate = true;
+        if (!isUndefined(o[key]) && flags.nargs[key] === 1 || Array.isArray(o[key]) && o[key].length === flags.nargs[key]) {
+          o[key] = undefined;
+        }
+      }
+      if (value === increment()) {
+        o[key] = increment(o[key]);
+      } else if (Array.isArray(o[key])) {
+        if (duplicate && isTypeArray && isValueArray) {
+          o[key] = configuration["flatten-duplicate-arrays"] ? o[key].concat(value) : (Array.isArray(o[key][0]) ? o[key] : [o[key]]).concat([value]);
+        } else if (!duplicate && Boolean(isTypeArray) === Boolean(isValueArray)) {
+          o[key] = value;
+        } else {
+          o[key] = o[key].concat([value]);
+        }
+      } else if (o[key] === undefined && isTypeArray) {
+        o[key] = isValueArray ? value : [value];
+      } else if (duplicate && !(o[key] === undefined || checkAllAliases(key, flags.counts) || checkAllAliases(key, flags.bools))) {
+        o[key] = [o[key], value];
+      } else {
+        o[key] = value;
+      }
+    }
+    function extendAliases(...args2) {
+      args2.forEach(function(obj) {
+        Object.keys(obj || {}).forEach(function(key) {
+          if (flags.aliases[key])
+            return;
+          flags.aliases[key] = [].concat(aliases[key] || []);
+          flags.aliases[key].concat(key).forEach(function(x) {
+            if (/-/.test(x) && configuration["camel-case-expansion"]) {
+              const c = camelCase(x);
+              if (c !== key && flags.aliases[key].indexOf(c) === -1) {
+                flags.aliases[key].push(c);
+                newAliases[c] = true;
+              }
+            }
+          });
+          flags.aliases[key].concat(key).forEach(function(x) {
+            if (x.length > 1 && /[A-Z]/.test(x) && configuration["camel-case-expansion"]) {
+              const c = decamelize(x, "-");
+              if (c !== key && flags.aliases[key].indexOf(c) === -1) {
+                flags.aliases[key].push(c);
+                newAliases[c] = true;
+              }
+            }
+          });
+          flags.aliases[key].forEach(function(x) {
+            flags.aliases[x] = [key].concat(flags.aliases[key].filter(function(y) {
+              return x !== y;
+            }));
+          });
+        });
+      });
+    }
+    function checkAllAliases(key, flag) {
+      const toCheck = [].concat(flags.aliases[key] || [], key);
+      const keys = Object.keys(flag);
+      const setAlias = toCheck.find((key2) => keys.includes(key2));
+      return setAlias ? flag[setAlias] : false;
+    }
+    function hasAnyFlag(key) {
+      const flagsKeys = Object.keys(flags);
+      const toCheck = [].concat(flagsKeys.map((k) => flags[k]));
+      return toCheck.some(function(flag) {
+        return Array.isArray(flag) ? flag.includes(key) : flag[key];
+      });
+    }
+    function hasFlagsMatching(arg, ...patterns) {
+      const toCheck = [].concat(...patterns);
+      return toCheck.some(function(pattern) {
+        const match = arg.match(pattern);
+        return match && hasAnyFlag(match[1]);
+      });
+    }
+    function hasAllShortFlags(arg) {
+      if (arg.match(negative) || !arg.match(/^-[^-]+/)) {
+        return false;
+      }
+      let hasAllFlags = true;
+      let next;
+      const letters = arg.slice(1).split("");
+      for (let j = 0;j < letters.length; j++) {
+        next = arg.slice(j + 2);
+        if (!hasAnyFlag(letters[j])) {
+          hasAllFlags = false;
+          break;
+        }
+        if (letters[j + 1] && letters[j + 1] === "=" || next === "-" || /[A-Za-z]/.test(letters[j]) && /^-?\d+(\.\d*)?(e-?\d+)?$/.test(next) || letters[j + 1] && letters[j + 1].match(/\W/)) {
+          break;
+        }
+      }
+      return hasAllFlags;
+    }
+    function isUnknownOptionAsArg(arg) {
+      return configuration["unknown-options-as-args"] && isUnknownOption(arg);
+    }
+    function isUnknownOption(arg) {
+      arg = arg.replace(/^-{3,}/, "--");
+      if (arg.match(negative)) {
+        return false;
+      }
+      if (hasAllShortFlags(arg)) {
+        return false;
+      }
+      const flagWithEquals = /^-+([^=]+?)=[\s\S]*$/;
+      const normalFlag = /^-+([^=]+?)$/;
+      const flagEndingInHyphen = /^-+([^=]+?)-$/;
+      const flagEndingInDigits = /^-+([^=]+?\d+)$/;
+      const flagEndingInNonWordCharacters = /^-+([^=]+?)\W+.*$/;
+      return !hasFlagsMatching(arg, flagWithEquals, negatedBoolean, normalFlag, flagEndingInHyphen, flagEndingInDigits, flagEndingInNonWordCharacters);
+    }
+    function defaultValue(key) {
+      if (!checkAllAliases(key, flags.bools) && !checkAllAliases(key, flags.counts) && `${key}` in defaults) {
+        return defaults[key];
+      } else {
+        return defaultForType(guessType(key));
+      }
+    }
+    function defaultForType(type) {
+      const def = {
+        [DefaultValuesForTypeKey.BOOLEAN]: true,
+        [DefaultValuesForTypeKey.STRING]: "",
+        [DefaultValuesForTypeKey.NUMBER]: undefined,
+        [DefaultValuesForTypeKey.ARRAY]: []
+      };
+      return def[type];
+    }
+    function guessType(key) {
+      let type = DefaultValuesForTypeKey.BOOLEAN;
+      if (checkAllAliases(key, flags.strings))
+        type = DefaultValuesForTypeKey.STRING;
+      else if (checkAllAliases(key, flags.numbers))
+        type = DefaultValuesForTypeKey.NUMBER;
+      else if (checkAllAliases(key, flags.bools))
+        type = DefaultValuesForTypeKey.BOOLEAN;
+      else if (checkAllAliases(key, flags.arrays))
+        type = DefaultValuesForTypeKey.ARRAY;
+      return type;
+    }
+    function isUndefined(num) {
+      return num === undefined;
+    }
+    function checkConfiguration() {
+      Object.keys(flags.counts).find((key) => {
+        if (checkAllAliases(key, flags.arrays)) {
+          error = Error(__("Invalid configuration: %s, opts.count excludes opts.array.", key));
+          return true;
+        } else if (checkAllAliases(key, flags.nargs)) {
+          error = Error(__("Invalid configuration: %s, opts.count excludes opts.narg.", key));
+          return true;
+        }
+        return false;
+      });
+    }
+    return {
+      aliases: Object.assign({}, flags.aliases),
+      argv: Object.assign(argvReturn, argv),
+      configuration,
+      defaulted: Object.assign({}, defaulted),
+      error,
+      newAliases: Object.assign({}, newAliases)
+    };
+  }
+}
+
+// node_modules/yargs-parser/build/lib/index.js
+import {readFileSync} from "fs";
+var _a;
+var _b;
+var _c;
+var minNodeVersion = process && process.env && process.env.YARGS_MIN_NODE_VERSION ? Number(process.env.YARGS_MIN_NODE_VERSION) : 12;
+var nodeVersion = (_b = (_a = process === null || process === undefined ? undefined : process.versions) === null || _a === undefined ? undefined : _a.node) !== null && _b !== undefined ? _b : (_c = process === null || process === undefined ? undefined : process.version) === null || _c === undefined ? undefined : _c.slice(1);
+if (nodeVersion) {
+  const major = Number(nodeVersion.match(/^([^.]+)/)[1]);
+  if (major < minNodeVersion) {
+    throw Error(`yargs parser supports a minimum Node.js version of ${minNodeVersion}. Read our version support policy: https://github.com/yargs/yargs-parser#supported-nodejs-versions`);
+  }
+}
+var env = process ? process.env : {};
+var parser = new YargsParser({
+  cwd: process.cwd,
+  env: () => {
+    return env;
+  },
+  format,
+  normalize,
+  resolve,
+  require: (path) => {
+    if (typeof __require !== "undefined") {
+      return __require(path);
+    } else if (path.match(/\.json$/)) {
+      return JSON.parse(readFileSync(path, "utf8"));
+    } else {
+      throw Error("only .json config files are supported in ESM");
+    }
+  }
 });
+var yargsParser = function Parser(args, opts) {
+  const result = parser.parse(args.slice(), opts);
+  return result.argv;
+};
+yargsParser.detailed = function(args, opts) {
+  return parser.parse(args.slice(), opts);
+};
+yargsParser.camelCase = camelCase;
+yargsParser.decamelize = decamelize;
+yargsParser.looksLikeNumber = looksLikeNumber;
+var lib_default = yargsParser;
 
 // node_modules/zod/lib/index.mjs
 var setErrorMap = function(map) {
@@ -2868,11 +1652,11 @@ class ZodType {
     throw result.error;
   }
   safeParse(data, params) {
-    var _a;
+    var _a2;
     const ctx = {
       common: {
         issues: [],
-        async: (_a = params === null || params === undefined ? undefined : params.async) !== null && _a !== undefined ? _a : false,
+        async: (_a2 = params === null || params === undefined ? undefined : params.async) !== null && _a2 !== undefined ? _a2 : false,
         contextualErrorMap: params === null || params === undefined ? undefined : params.errorMap
       },
       path: (params === null || params === undefined ? undefined : params.path) || [],
@@ -3202,7 +1986,7 @@ class ZodString extends ZodType {
       } else if (check.kind === "url") {
         try {
           new URL(input.data);
-        } catch (_a) {
+        } catch (_a2) {
           ctx = this._getOrReturnCtx(input, ctx);
           addIssueToContext(ctx, {
             validation: "url",
@@ -3324,7 +2108,7 @@ class ZodString extends ZodType {
     return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
   }
   datetime(options) {
-    var _a;
+    var _a2;
     if (typeof options === "string") {
       return this._addCheck({
         kind: "datetime",
@@ -3336,7 +2120,7 @@ class ZodString extends ZodType {
     return this._addCheck({
       kind: "datetime",
       precision: typeof (options === null || options === undefined ? undefined : options.precision) === "undefined" ? null : options === null || options === undefined ? undefined : options.precision,
-      offset: (_a = options === null || options === undefined ? undefined : options.offset) !== null && _a !== undefined ? _a : false,
+      offset: (_a2 = options === null || options === undefined ? undefined : options.offset) !== null && _a2 !== undefined ? _a2 : false,
       ...errorUtil.errToObj(options === null || options === undefined ? undefined : options.message)
     });
   }
@@ -3460,11 +2244,11 @@ class ZodString extends ZodType {
   }
 }
 ZodString.create = (params) => {
-  var _a;
+  var _a2;
   return new ZodString({
     checks: [],
     typeName: ZodFirstPartyTypeKind.ZodString,
-    coerce: (_a = params === null || params === undefined ? undefined : params.coerce) !== null && _a !== undefined ? _a : false,
+    coerce: (_a2 = params === null || params === undefined ? undefined : params.coerce) !== null && _a2 !== undefined ? _a2 : false,
     ...processCreateParams(params)
   });
 };
@@ -3859,11 +2643,11 @@ class ZodBigInt extends ZodType {
   }
 }
 ZodBigInt.create = (params) => {
-  var _a;
+  var _a2;
   return new ZodBigInt({
     checks: [],
     typeName: ZodFirstPartyTypeKind.ZodBigInt,
-    coerce: (_a = params === null || params === undefined ? undefined : params.coerce) !== null && _a !== undefined ? _a : false,
+    coerce: (_a2 = params === null || params === undefined ? undefined : params.coerce) !== null && _a2 !== undefined ? _a2 : false,
     ...processCreateParams(params)
   });
 };
@@ -4351,8 +3135,8 @@ class ZodObject extends ZodType {
       unknownKeys: "strict",
       ...message !== undefined ? {
         errorMap: (issue, ctx) => {
-          var _a, _b, _c, _d;
-          const defaultError = (_c = (_b = (_a = this._def).errorMap) === null || _b === undefined ? undefined : _b.call(_a, issue, ctx).message) !== null && _c !== undefined ? _c : ctx.defaultError;
+          var _a2, _b2, _c2, _d;
+          const defaultError = (_c2 = (_b2 = (_a2 = this._def).errorMap) === null || _b2 === undefined ? undefined : _b2.call(_a2, issue, ctx).message) !== null && _c2 !== undefined ? _c2 : ctx.defaultError;
           if (issue.code === "unrecognized_keys")
             return {
               message: (_d = errorUtil.errToObj(message).message) !== null && _d !== undefined ? _d : defaultError
@@ -5650,10 +4434,10 @@ ZodReadonly.create = (type, params) => {
 var custom = (check, params = {}, fatal) => {
   if (check)
     return ZodAny.create().superRefine((data, ctx) => {
-      var _a, _b;
+      var _a2, _b2;
       if (!check(data)) {
         const p = typeof params === "function" ? params(data) : typeof params === "string" ? { message: params } : params;
-        const _fatal = (_b = (_a = p.fatal) !== null && _a !== undefined ? _a : fatal) !== null && _b !== undefined ? _b : true;
+        const _fatal = (_b2 = (_a2 = p.fatal) !== null && _a2 !== undefined ? _a2 : fatal) !== null && _b2 !== undefined ? _b2 : true;
         const p2 = typeof p === "string" ? { message: p } : p;
         ctx.addIssue({ code: "custom", ...p2, fatal: _fatal });
       }
@@ -5900,7 +4684,7 @@ function noCase(input, options) {
   const [prefix, words, suffix] = splitPrefixSuffix(input, options);
   return prefix + words.map(lowerFactory(options?.locale)).join(options?.delimiter ?? " ") + suffix;
 }
-function camelCase(input, options) {
+function camelCase2(input, options) {
   const [prefix, words, suffix] = splitPrefixSuffix(input, options);
   const lower = lowerFactory(options?.locale);
   const upper = upperFactory(options?.locale);
@@ -5963,6 +4747,7 @@ var SPLIT_REPLACE_VALUE = "$1\0$2";
 var DEFAULT_PREFIX_SUFFIX_CHARACTERS = "";
 
 // zli.ts
+import * as readline from "readline";
 var ok = function(value) {
   return [value, null];
 };
@@ -5971,10 +4756,10 @@ var err = function(value, error) {
 };
 function zli(opts) {
   opts ??= {};
-  if (typeof opts.stdout === "undefined") {
+  if (opts.stdout == null) {
     opts.stdout = process.stdout;
   }
-  return new _Zli(opts.stdout);
+  return new _Zli(opts.stdout, setupKeys());
 }
 var camelCaseArgs = function(args) {
   return Object.keys(args).reduce((acc, key) => {
@@ -5984,22 +4769,22 @@ var camelCaseArgs = function(args) {
     if (typeof args[key] === "object" && !Array.isArray(args[key])) {
       return {
         ...acc,
-        [camelCase(key)]: camelCaseArgs(args[key])
+        [camelCase2(key)]: camelCaseArgs(args[key])
       };
     }
     return {
       ...acc,
-      [camelCase(key)]: args[key]
+      [camelCase2(key)]: args[key]
     };
   }, Object.create(null));
 };
 function expandShorthandOptions(args, shorthands) {
-  if (typeof shorthands === "undefined") {
+  if (shorthands == null) {
     return args;
   }
   for (const [longhand, shorthand] of Object.entries(shorthands)) {
     const key = shorthand.substring(1);
-    if (typeof args[key] !== "undefined") {
+    if (args[key] != null) {
       args[longhand] = args[shorthand.substring(1)];
       delete args[shorthand.substring(1)];
     }
@@ -6007,12 +4792,12 @@ function expandShorthandOptions(args, shorthands) {
   return args;
 }
 function parseArguments(args, schema) {
-  if (typeof schema === "undefined") {
+  if (schema == null) {
     return ok(args);
   }
   const parsedArgs = Object.create(null);
   const schemaDefinitions = Object.entries(schema);
-  const requiredArgsCount = schemaDefinitions.filter(([_2, shape]) => !shape.isOptional() || shape instanceof z.ZodDefault && typeof shape._def.defaultValue() !== "undefined").length;
+  const requiredArgsCount = schemaDefinitions.filter(([_, shape]) => !shape.isOptional() || shape instanceof z.ZodDefault && shape._def.defaultValue() != null).length;
   if (args._.length < requiredArgsCount) {
     return err(args, incorrectUsageError);
   }
@@ -6020,7 +4805,7 @@ function parseArguments(args, schema) {
   for (;i < args._.length; i++) {
     const value = args._[i];
     const schema2 = schemaDefinitions[i];
-    if (typeof schema2 === "undefined") {
+    if (schema2 == null) {
       return parsedArgs;
     }
     const [key, shape] = schemaDefinitions[i];
@@ -6039,7 +4824,7 @@ function parseArguments(args, schema) {
   return ok(parsedArgs);
 }
 function parseOptions(ignoreUnknownOptions, options, schema) {
-  if (typeof schema === "undefined") {
+  if (schema == null) {
     return ok(options);
   }
   const parsedOptions = Object.create(null);
@@ -6084,11 +4869,11 @@ function parseOptions(ignoreUnknownOptions, options, schema) {
   return ok(parsedOptions);
 }
 function assertNoRequiredArgsAfterOptional(args) {
-  if (typeof args === "undefined") {
+  if (args == null) {
     return;
   }
   let isReadingRequired = true;
-  for (const [_2, shape] of Object.entries(args)) {
+  for (const [_, shape] of Object.entries(args)) {
     if ((shape.isOptional() || shape instanceof z.ZodDefault) && isReadingRequired) {
       isReadingRequired = false;
     } else if (!isReadingRequired) {
@@ -6098,7 +4883,7 @@ function assertNoRequiredArgsAfterOptional(args) {
 }
 function buildHelpDisplay(name, commands, description, args, options, shorthands) {
   const lines = new Array;
-  if (typeof args !== "undefined") {
+  if (args != null) {
     lines.push("Usage:", "");
     const requiredArgs = [];
     const optionalArgs = [];
@@ -6120,10 +4905,10 @@ function buildHelpDisplay(name, commands, description, args, options, shorthands
   } else {
     lines.push(name);
   }
-  if (typeof description !== "undefined") {
+  if (description != null) {
     lines.push("\nDescription:", `\t${description}`, "");
   }
-  if (typeof options !== "undefined") {
+  if (options != null) {
     lines.push("Options:");
     for (const [name2, shape] of Object.entries(options)) {
       const dashName = kebabCase(name2);
@@ -6135,19 +4920,19 @@ function buildHelpDisplay(name, commands, description, args, options, shorthands
       }
       const padding = Array(spacesToAdd).map(() => "").join(" ");
       lines.push(`${nameToDisplay}${padding}${typename}`);
-      if (typeof shape.description !== "undefined" && !shape.description.match(/undefined/i)) {
+      if (shape.description != null && !shape.description.match(/undefined/i)) {
         lines.push(`\t${shape.description}`);
       }
     }
     lines.push("");
   }
-  if (typeof commands !== "undefined") {
-    for (const [name2, command] of commands.entries()) {
+  if (commands != null) {
+    for (const [name2, command] of Object.entries(commands)) {
       const description2 = command.getDescription();
       lines.push(name2, `\t${description2}`);
     }
   }
-  return ok(lines);
+  return lines;
 }
 function getTypename(shape) {
   if (shape instanceof z.ZodOptional) {
@@ -6180,7 +4965,7 @@ function getTypename(shape) {
   return "";
 }
 function parse(value, definition) {
-  if (typeof value === "undefined") {
+  if (value == null) {
     if (definition instanceof z.ZodDefault) {
       return definition._def.defaultValue();
     }
@@ -6189,7 +4974,10 @@ function parse(value, definition) {
   if (typeof value === "object") {
     return definition?.parse(value) ?? value;
   }
-  const trimmed = String(value).trim();
+  let trimmed = String(value).trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+    trimmed = trimmed.slice(1, -1);
+  }
   const lowered = trimmed.toLowerCase();
   if (!trimmed || String(trimmed).length === 0) {
     return definition.parse("");
@@ -6204,7 +4992,7 @@ function parse(value, definition) {
     }
   }
   if (definition instanceof z.ZodString) {
-    return definition.parse(String(trimmed));
+    return definition.parse(trimmed);
   }
   if (definition instanceof z.ZodNumber) {
     return definition.parse(parseFloat(trimmed));
@@ -6233,12 +5021,20 @@ var spreadLikeButter = function(...objs) {
   }
   return result;
 };
-var parser = require_build();
+var setupKeys = function() {
+  return {
+    watch(args) {
+      return this;
+    }
+  };
+};
 var TERMINAL_WIDTH = 80;
 
 class _Zli {
   _stdout;
-  _commands = new Map;
+  _keys;
+  _rl;
+  _commands = {};
   _meta = {
     showHelpOnError: false,
     showHelpOnNotFound: false,
@@ -6250,26 +5046,37 @@ class _Zli {
   _version;
   _beforeInvoke;
   _afterInvoke;
-  constructor(_stdout) {
+  _helpFn;
+  constructor(_stdout, _keys) {
     this._stdout = _stdout;
+    this._keys = _keys;
+    this._rl = readline.createInterface(process.stdin);
   }
   getStdout() {
     return this._stdout;
   }
   command(name, cmd) {
-    const command = new _Command(name, this, null);
+    const command = new _Command(name, this, null, this._keys);
     const setupCommand = cmd(command);
-    this._commands.set(name.toLowerCase(), setupCommand);
+    this._commands[name.toLowerCase()] = setupCommand;
+    return this;
+  }
+  option(name, type) {
+    this._globalOptions = {
+      ...this._globalOptions ?? {},
+      [name]: type
+    };
     return this;
   }
   options(opts) {
     this._globalOptions = { ...this._globalOptions ?? {}, ...opts };
     return this;
   }
-  help() {
-    return this.options({
-      help: z.boolean().optional()
-    }).shorthands({ help: "-h" });
+  help(fn) {
+    if (fn != null) {
+      this._helpFn = fn;
+    }
+    return this.option("help", z.boolean().optional().describe("Show help")).shorthands({ help: "-h" });
   }
   shorthands(shorthands) {
     this._globalShorthands = {
@@ -6288,11 +5095,22 @@ class _Zli {
   }
   version(version) {
     this._version = version;
-    return this;
+    return this.option("version", z.boolean().optional().describe("The current version of the application")).shorthands({ version: "-v" }).beforeInvoke(({ version: version2 }) => {
+      if (version2 === true && this._version != null) {
+        this._stdout.write(this._version);
+        process.exit();
+      }
+    });
   }
-  displayHelp() {
-    const help = buildHelpDisplay("", this._commands, undefined, undefined, this._globalOptions, this._globalShorthands);
-    this.write(help);
+  async displayHelp() {
+    const meta = new Array;
+    if (this._helpFn != null) {
+      const help = await this._helpFn(meta);
+      this.write(help);
+    } else {
+      const help = buildHelpDisplay("", this._commands, undefined, undefined, this._globalOptions, this._globalShorthands);
+      this.write(help);
+    }
   }
   write(output) {
     if (Array.isArray(output)) {
@@ -6310,31 +5128,48 @@ class _Zli {
     this._afterInvoke = fn;
     return this;
   }
+  invoke(fn) {
+    this._commands[""] = new _Command("", this, null, this._keys);
+    this._commands[""].invoke(fn);
+    return this;
+  }
+  setupReadline() {
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      readline.emitKeypressEvents(process.stdin, this._rl);
+      process.stdin.on("keypress", (_, key) => {
+        if (key.sequence === "\x03") {
+          process.exit();
+        }
+      });
+    }
+  }
   async exec(args) {
-    if (typeof args === "undefined") {
+    this.setupReadline();
+    if (args == null) {
       args = process.argv.slice(2);
     }
-    const parsedArgs = camelCaseArgs(parser(args));
-    if (typeof this._formattedArgs === "undefined") {
+    const parsedArgs = camelCaseArgs(lib_default(args, { configuration: { "boolean-negation": false } }));
+    if (this._formattedArgs == null) {
       this._formattedArgs = parsedArgs;
     } else {
       this._formattedArgs = { ...this._formattedArgs, ...parsedArgs };
     }
     const [runArg, ...restArgs] = this._formattedArgs._;
     const expandedArgs = expandShorthandOptions(this._formattedArgs, this._globalShorthands);
-    if (expandedArgs["help"] === true && typeof runArg === "undefined" && typeof this._globalOptions?.help !== "undefined") {
-      return this.displayHelp();
+    if (expandedArgs["help"] === true && runArg == null && this._globalOptions?.help != null) {
+      return await this.displayHelp();
     }
     const [globalOptions, globalOptionsErr] = parseOptions(true, expandedArgs, this._globalOptions);
     if (globalOptionsErr != null) {
       this.write(globalOptionsErr.message);
       return;
     }
-    if (typeof this._beforeInvoke !== "undefined") {
+    if (this._beforeInvoke != null) {
       await this._beforeInvoke(globalOptions);
     }
-    const cmd = this._commands.get(runArg);
-    if (typeof cmd !== "undefined") {
+    const cmd = runArg == null ? this._commands[""] : this._commands[runArg] ?? this._commands[""];
+    if (cmd != null) {
       const args2 = {
         ...this._formattedArgs,
         ...expandedArgs,
@@ -6343,13 +5178,13 @@ class _Zli {
       const [didExecute, execError] = await cmd.exec(args2, globalOptions);
       if (execError != null) {
         if (this._meta.showHelpOnError) {
-          this.displayHelp();
+          await this.displayHelp();
         }
         if (execError === zliError) {
           this.write(execError.message);
         } else if (execError instanceof z.ZodError) {
           for (const zerr of execError.errors) {
-            const [_2, argName] = zerr.path;
+            const [_, argName] = zerr.path;
             this.write(`${zerr.message} ${argName ? `(${argName})` : ""}`);
           }
         } else {
@@ -6357,22 +5192,39 @@ class _Zli {
         }
       } else if (!didExecute) {
         if (this._meta.showHelpOnNotFound) {
-          this.displayHelp();
+          await this.displayHelp();
         }
       }
-    } else if (typeof runArg !== "undefined") {
+    } else if (runArg != null) {
       this.write(`Command not found: ${runArg}`);
       if (this._meta.showHelpOnNotFound) {
-        this.displayHelp();
+        await this.displayHelp();
       }
-    } else if (typeof this._version !== "undefined") {
+    } else if (this._version != null) {
       this._stdout.write(this._version);
     } else if (this._globalOptions?.help) {
-      this.displayHelp();
+      await this.displayHelp();
     }
-    if (typeof this._afterInvoke !== "undefined") {
+    if (this._afterInvoke != null) {
       this._afterInvoke(globalOptions);
     }
+  }
+  embed(stdin = process.stdin) {
+    return new Promise((resolve2) => {
+      let isRunning = true;
+      while (isRunning) {
+        this._rl.question("> ", async (input) => {
+          if (input.match(/\.exit/i)) {
+            this._rl.write("Exiting");
+            this._rl.close();
+            isRunning = false;
+          } else {
+            await this.exec(input);
+          }
+        });
+      }
+      resolve2();
+    });
   }
 }
 
@@ -6380,7 +5232,8 @@ class _Command {
   _name;
   _factory;
   _parent;
-  _commands = new Map;
+  _keys;
+  _commands = {};
   _meta;
   _help;
   _description;
@@ -6397,20 +5250,21 @@ class _Command {
     }
     return `${this._parent.fullName} ${this._name}`;
   }
-  constructor(_name, _factory, _parent) {
+  constructor(_name, _factory, _parent, _keys) {
     this._name = _name;
     this._factory = _factory;
     this._parent = _parent;
+    this._keys = _keys;
     this._meta = _factory._meta;
   }
   _getSubcommandWithNewArgs(args) {
-    if (typeof args === "undefined") {
+    if (args == null) {
       return [undefined, args];
     }
     const [arg] = args._;
     const slicedArgs = { ...args, _: args._.slice(1) };
-    if (typeof arg !== "undefined" && this._commands.has(arg)) {
-      return [this._commands.get(arg), slicedArgs];
+    if (arg != null && this._commands[arg] != null) {
+      return [this._commands[arg], slicedArgs];
     }
     return [undefined, slicedArgs];
   }
@@ -6435,9 +5289,9 @@ class _Command {
     return subcommand?.getShorthands(newArgs) ?? this._shorthands;
   }
   command(name, cmd) {
-    const command = new _Command(name, this._factory, this);
+    const command = new _Command(name, this._factory, this, this._keys);
     const setupCommand = cmd(command);
-    this._commands.set(name.toLowerCase(), setupCommand);
+    this._commands[name.toLowerCase()] = setupCommand;
     return this;
   }
   help(help) {
@@ -6452,8 +5306,15 @@ class _Command {
     this._argsSchema = args;
     return this;
   }
+  option(name, type) {
+    this._optsSchema = {
+      ...this._optsSchema ?? {},
+      [name]: type
+    };
+    return this;
+  }
   options(opts) {
-    this._optsSchema = opts;
+    this._optsSchema = { ...this._optsSchema ?? {}, ...opts };
     return this;
   }
   shorthands(shorthands) {
@@ -6481,7 +5342,7 @@ class _Command {
     return this;
   }
   displayHelp() {
-    const [help] = buildHelpDisplay(this._name, this._commands, this._description, this._argsSchema, this._optsSchema, this._shorthands);
+    const help = buildHelpDisplay(this._name, this._commands, this._description, this._argsSchema, this._optsSchema, this._shorthands);
     this._factory.write(help);
   }
   async exec(args, globalOptions) {
@@ -6527,7 +5388,11 @@ class _Command {
     }
     const invokeArgs = spreadLikeButter(args, globalOptions, parsedArgs, parsedOptions);
     try {
-      await this._invoke(invokeArgs, this._factory.getStdout());
+      const meta = {
+        stdout: this._factory.getStdout(),
+        keys: this._keys
+      };
+      await this._invoke(invokeArgs, meta);
       await this._postinvoke?.(globalOptions);
     } catch (error) {
       if (error == noRequiredArgumentsAfterOptionalsError || error == unknownOptionError) {
