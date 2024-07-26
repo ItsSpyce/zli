@@ -1,6 +1,6 @@
 # ZLI
 
-ZLI is a CLI framework for Node/Bun. While it was primarily made for Bun, it uses no Bun dependencies, so it should function with Node just as well.
+ZLI is a CLI framework for Node/Bun. While it was primarily made for Bun, it uses no Bun dependencies, so it should function with Node just as well. Readme is in progress.
 
 ## Usage
 

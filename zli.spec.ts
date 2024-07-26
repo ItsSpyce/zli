@@ -54,6 +54,24 @@ describe('zli', () => {
     await instance.exec(['echo']);
     expect(stdout.read()).toMatch(/hellohello/i);
   });
+
+  test('allows options to be passed in one by one', async () => {
+    const stdout = createWriteStream();
+    const instance = zli({ stdout }).command('greet', (cmd) =>
+      cmd
+        .option('uppercase', z.boolean().default(false))
+        .option('lowercase', z.boolean().default(true))
+        .invoke(({ uppercase, lowercase }, { stdout }) => {
+          if (uppercase || !lowercase) {
+            stdout.write('HELLO');
+          } else {
+            stdout.write('hello');
+          }
+        })
+    );
+    await instance.exec(['greet', '--uppercase']);
+    expect(stdout.read()).toMatch(/HELLO/);
+  });
 });
 
 describe('zli helper functions', () => {
@@ -136,7 +154,7 @@ describe('zli commands', () => {
     const stdout = createWriteStream();
     await zli({ stdout })
       .command('echo', (cmd) =>
-        cmd.invoke((_, stdout) => stdout.write('Hello world'))
+        cmd.invoke((_, { stdout }) => stdout.write('Hello world'))
       )
       .exec(['echo']);
 
@@ -147,7 +165,7 @@ describe('zli commands', () => {
     const stdout = createWriteStream();
     await zli({ stdout })
       .command('echo', (cmd) =>
-        cmd.invoke(({ _ }, stdout) => {
+        cmd.invoke(({ _ }, { stdout }) => {
           if (_.length === 0) {
             stdout.write('Error: No message provided');
           } else {
@@ -174,7 +192,7 @@ describe('zli commands', () => {
           .arguments({
             name: z.string(),
           })
-          .invoke(({ name }, stdout) => {
+          .invoke(({ name }, { stdout }) => {
             mockFn(name);
             stdout.write(`Hello, ${name}!`);
           })
@@ -183,5 +201,34 @@ describe('zli commands', () => {
 
     expect(mockFn).toHaveBeenCalledWith('John Doe');
     expect(stdout.read()).toMatch(/hello, john doe/i);
+  });
+
+  test('calls the exec function for the CLI when no command is setup', async () => {
+    const stdout = createWriteStream();
+    const mockFn = mock((_: string) => {});
+    await zli({ stdout })
+      .invoke((_, { stdout }) => {
+        mockFn('Hello world');
+        stdout.write('Executed');
+      })
+      .exec();
+
+    expect(stdout.read()).toMatch(/executed/i);
+    expect(mockFn).toHaveBeenCalledWith('Hello world');
+  });
+
+  test('calls the exec function for the CLI with options when no command is setup', async () => {
+    const stdout = createWriteStream();
+    await zli({ stdout })
+      .option('uppercase', z.boolean().default(false))
+      .invoke(({ uppercase }, { stdout }) => {
+        if (uppercase) {
+          stdout.write('HELLO');
+        } else {
+          stdout.write('hello');
+        }
+      })
+      .exec('--uppercase');
+    expect(stdout.read()).toMatch(/HELLO/);
   });
 });

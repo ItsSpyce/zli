@@ -1,4 +1,4 @@
-const parser = require('yargs-parser');
+import parser from 'yargs-parser';
 import { z } from 'zod';
 import { camelCase, kebabCase } from 'change-case';
 import type { WriteStream } from 'tty';
@@ -59,6 +59,15 @@ export interface CommandPreInvokeFunction<TGlobalOptions extends OptionsShape> {
   (options: Options<TGlobalOptions>): void | Promise<void>;
 }
 
+export interface CommandMeta {
+  get stdout(): ZliWriteStream;
+  get keys(): KeyWatcher;
+}
+
+export interface KeyWatcher {
+  watch(args: { key: string; ctrl?: boolean; shift?: boolean }): KeyWatcher;
+}
+
 /**
  * The command handler interface for a command
  */
@@ -72,10 +81,7 @@ export interface CommandInvokeFunction<
      * A collection of arguments in the order of TGlobalOptions -> TArgs -> TOptions
      */
     args: ParsedArguments & Arguments<TGlobalOptions & TArgs & TOptions>,
-    /**
-     * A secondary reference to the ZliWriteStream used
-     */
-    stdout: ZliWriteStream
+    meta: CommandMeta
   ): void | Promise<void>;
 }
 
@@ -111,7 +117,7 @@ export type ParsedArguments = {
   /**
    * Represents the remaining arguments that do not have keys or definitions
    */
-  _: Array<string>;
+  _: Array<string | number>;
 };
 
 /**
@@ -145,12 +151,12 @@ export type OptionsShape = {
   [name: string]: PermittedZodTypes;
 };
 
-/**
- * Represents a type that extends `OptionsShape` and includes an optional `help` property.
- * @template T - The type that extends `OptionsShape`.
- */
-export type WithHelp<T extends OptionsShape> = T & {
-  help: z.ZodOptional<z.ZodBoolean>;
+export type AddOption<
+  TBaseOptions extends OptionsShape,
+  TName extends string,
+  TShape extends PermittedZodTypes
+> = TBaseOptions & {
+  [key in TName]: TShape;
 };
 
 /**
@@ -189,6 +195,43 @@ type InvokeMeta = {
   footer?: string;
 };
 
+export type CommandHelpArgumentMeta = {
+  name: string;
+  optional: boolean;
+  description?: string;
+  type: 'string' | 'number' | 'boolean';
+};
+
+export type CommandHelpOptionMeta = {
+  name: string;
+  description?: string;
+  shorthand?: `-${string}`;
+  type: 'string' | 'number' | 'boolean';
+};
+
+export type CommandHelpMeta = {
+  /**
+   * The name of the command
+   */
+  name: string;
+  /**
+   * The description of the command. Added by "command.describe".
+   */
+  description?: string;
+  /**
+   * The arguments for the command in positional order. If none, will be empty.
+   */
+  arguments: CommandHelpArgumentMeta[];
+  /**
+   * The options for the command. If none, will be empty.
+   */
+  options: CommandHelpOptionMeta[];
+  /**
+   * The subcommands for the command. If none, will be empty.
+   */
+  commands: CommandHelpMeta[];
+};
+
 /**
  * Represents the main interface for a Zli command-line application.
  *
@@ -214,12 +257,24 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
   ): Zli<TGlobalOptions>;
 
   /**
-   * Sets the options for the Zli interface.
+   * Adds a single option to the Zli interface.
+   * @param name The name of the option
+   * @param type The type of the option
+   */
+  option<TOptionName extends string, TOptionType extends PermittedZodTypes>(
+    name: TOptionName,
+    type: TOptionType
+  ): Zli<AddOption<TGlobalOptions, TOptionName, TOptionType>>;
+
+  /**
+   * Adds the options for the Zli interface.
    * @template TOptions - The shape of the options.
    * @param opts - The options to set.
    * @returns The updated Zli interface.
    */
-  options<TOptions extends OptionsShape>(opts: TOptions): Zli<TOptions>;
+  options<TOptions extends OptionsShape>(
+    opts: TOptions
+  ): Zli<TGlobalOptions & TOptions>;
 
   /**
    * Sets a function to be executed before invoking a command.
@@ -239,6 +294,10 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
     fn: (opts: Options<TGlobalOptions>) => void | Promise<void>
   ): Zli<TGlobalOptions>;
 
+  invoke(
+    fn: CommandInvokeFunction<TGlobalOptions, EmptyOptions, EmptyOptions>
+  ): Zli<TGlobalOptions>;
+
   /**
    * Executes the Zli command with the specified arguments.
    * @param args - The command arguments.
@@ -247,12 +306,6 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
   exec(args?: string | string[]): Promise<void>;
 
   embed(stdin?: NodeJS.ReadStream): Promise<void>;
-
-  /**
-   * Displays the help information for the Zli interface.
-   * @returns The updated Zli interface with help information.
-   */
-  help(): Zli<WithHelp<TGlobalOptions>>;
 
   /**
    * Sets the shorthand definitions for the Zli interface.
@@ -264,11 +317,28 @@ export interface Zli<TGlobalOptions extends OptionsShape = EmptyOptions> {
   ): Zli<TGlobalOptions>;
 
   /**
+   * Displays the help information for the Zli interface.
+   * @returns The updated Zli interface with help information.
+   */
+  help(): Zli<AddOption<TGlobalOptions, 'help', z.ZodOptional<z.ZodBoolean>>>;
+  /**
+   * Calls the {fn} function when --help is passed
+   * @param fn The function to call when --help is passed
+   */
+  help(
+    fn: (
+      meta: CommandHelpMeta[]
+    ) => string | string[] | Promise<string> | Promise<string[]>
+  ): Zli<AddOption<TGlobalOptions, 'help', z.ZodOptional<z.ZodBoolean>>>;
+
+  /**
    * Sets the version for the Zli interface.
    * @param version - The version string.
    * @returns The updated Zli interface.
    */
-  version(version: string): Zli<TGlobalOptions>;
+  version(
+    version: string
+  ): Zli<AddOption<TGlobalOptions, 'version', z.ZodOptional<z.ZodBoolean>>>;
 
   /**
    * Configures the Zli interface to show help information when a command is not found.
@@ -335,6 +405,20 @@ export interface Command<
   ): Command<TGlobalOptions, TArgs, TOptions>;
 
   /**
+   * Adds a single option to the current command.
+   * @param name The name of the option
+   * @param type The shape of the option
+   */
+  option<TOptionName extends string, TOptionType extends PermittedZodTypes>(
+    name: TOptionName,
+    type: TOptionType
+  ): Command<
+    TGlobalOptions,
+    TArgs,
+    AddOption<TOptions, TOptionName, TOptionType>
+  >;
+
+  /**
    * Sets the options for the current command.
    * @param opts - The shape of the command options.
    * @returns The current command with the updated options.
@@ -398,7 +482,11 @@ export interface Command<
 /// Implementations
 
 class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
-  readonly _commands = new Map<string, _Command<TGlobalOptions, any, any>>();
+  readonly _rl: readline.Interface;
+  readonly _commands: Record<
+    string | number,
+    _Command<TGlobalOptions, any, any>
+  > = {};
   readonly _meta: InvokeMeta = {
     showHelpOnError: false,
     showHelpOnNotFound: false,
@@ -410,8 +498,16 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   _version?: string;
   _beforeInvoke?: (opts: Options<TGlobalOptions>) => void | Promise<void>;
   _afterInvoke?: (opts: Options<TGlobalOptions>) => void | Promise<void>;
+  _helpFn?: (
+    meta: CommandHelpMeta[]
+  ) => string | string[] | Promise<string> | Promise<string[]>;
 
-  constructor(private readonly _stdout: ZliWriteStream) {}
+  constructor(
+    private readonly _stdout: ZliWriteStream,
+    private readonly _keys: KeyWatcher
+  ) {
+    this._rl = readline.createInterface(process.stdin);
+  }
 
   getStdout() {
     return this._stdout;
@@ -435,15 +531,33 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     const command = new _Command<TGlobalOptions, TArgs2, TOptions2>(
       name,
       this,
-      null
+      null,
+      this._keys
     );
     const setupCommand = cmd(command) as _Command<
       TGlobalOptions,
       TArgs2,
       TOptions2
     >;
-    this._commands.set(name.toLowerCase(), setupCommand);
+    this._commands[name.toLowerCase()] = setupCommand;
     return this;
+  }
+
+  /**
+   *
+   * @param {TOptionName} name The name of the option
+   * @param {TOptionType} type The zod type of the option
+   * @returns {_Zli<TGlobalOptions & { [key in TOptionName]: TOptionType }>} - The updated Zli instance with the new option.
+   */
+  option<TOptionName extends string, TOptionType extends PermittedZodTypes>(
+    name: TOptionName,
+    type: TOptionType
+  ): _Zli<AddOption<TGlobalOptions, TOptionName, TOptionType>> {
+    this._globalOptions = {
+      ...(this._globalOptions ?? {}),
+      [name]: type,
+    } as any;
+    return this as _Zli<TGlobalOptions & { [key in TOptionName]: TOptionType }>;
   }
 
   /**
@@ -460,10 +574,18 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     return this as any;
   }
 
-  help(): _Zli<WithHelp<TGlobalOptions>> {
-    return this.options({
-      help: z.boolean().optional(),
-    }).shorthands({ help: '-h' }) as _Zli<WithHelp<TGlobalOptions>>;
+  help(
+    fn?: (
+      meta: CommandHelpMeta[]
+    ) => string | string[] | Promise<string> | Promise<string[]>
+  ): _Zli<AddOption<TGlobalOptions, 'help', z.ZodOptional<z.ZodBoolean>>> {
+    if (fn != null) {
+      this._helpFn = fn;
+    }
+    return this.option(
+      'help',
+      z.boolean().optional().describe('Show help')
+    ).shorthands({ help: '-h' });
   }
 
   /**
@@ -508,21 +630,39 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
    * @param version - The version string to set.
    * @returns The updated Zli instance.
    */
-  version(version: string): _Zli<TGlobalOptions> {
+  version(
+    version: string
+  ): _Zli<AddOption<TGlobalOptions, 'version', z.ZodOptional<z.ZodBoolean>>> {
     this._version = version;
-    return this;
+    return this.option(
+      'version',
+      z.boolean().optional().describe('The current version of the application')
+    )
+      .shorthands({ version: '-v' })
+      .beforeInvoke(({ version }) => {
+        if (version === true && this._version != null) {
+          this._stdout.write(this._version);
+          process.exit();
+        }
+      });
   }
 
-  displayHelp() {
-    const help = buildHelpDisplay(
-      '',
-      this._commands,
-      undefined,
-      undefined,
-      this._globalOptions,
-      this._globalShorthands
-    );
-    this.write(help);
+  async displayHelp() {
+    const meta = new Array<CommandHelpMeta>();
+    if (this._helpFn != null) {
+      const help = await this._helpFn(meta);
+      this.write(help);
+    } else {
+      const help = buildHelpDisplay(
+        '',
+        this._commands,
+        undefined,
+        undefined,
+        this._globalOptions,
+        this._globalShorthands
+      );
+      this.write(help);
+    }
   }
 
   write(output: string | string[]) {
@@ -548,11 +688,34 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     return this;
   }
 
+  invoke(
+    fn: CommandInvokeFunction<TGlobalOptions, EmptyOptions, EmptyOptions>
+  ): _Zli<TGlobalOptions> {
+    this._commands[''] = new _Command('', this, null, this._keys);
+    this._commands[''].invoke(fn);
+    return this;
+  }
+
+  setupReadline() {
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      readline.emitKeypressEvents(process.stdin, this._rl);
+      process.stdin.on('keypress', (_, key: readline.Key) => {
+        if (key.sequence === '\u0003') {
+          process.exit();
+        }
+      });
+    }
+  }
+
   async exec(args?: string | string[]): Promise<void> {
+    this.setupReadline();
     if (args == null) {
       args = process.argv.slice(2);
     }
-    const parsedArgs = camelCaseArgs(parser(args));
+    const parsedArgs = camelCaseArgs(
+      parser(args, { configuration: { 'boolean-negation': false } })
+    );
     if (this._formattedArgs == null) {
       this._formattedArgs = parsedArgs;
     } else {
@@ -570,7 +733,7 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       runArg == null &&
       this._globalOptions?.help != null
     ) {
-      return this.displayHelp();
+      return await this.displayHelp();
     }
     const [globalOptions, globalOptionsErr] = parseOptions(
       true,
@@ -584,7 +747,11 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
     if (this._beforeInvoke != null) {
       await this._beforeInvoke(globalOptions);
     }
-    const cmd = this._commands.get(runArg);
+    const cmd =
+      runArg == null
+        ? this._commands['']
+        : this._commands[runArg] ?? this._commands[''];
+
     if (cmd != null) {
       const args = {
         ...this._formattedArgs,
@@ -594,7 +761,7 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
       const [didExecute, execError] = await cmd.exec(args, globalOptions);
       if (execError != null) {
         if (this._meta.showHelpOnError) {
-          this.displayHelp();
+          await this.displayHelp();
         }
         if (execError === zliError) {
           this.write(execError.message);
@@ -610,18 +777,18 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
         }
       } else if (!didExecute) {
         if (this._meta.showHelpOnNotFound) {
-          this.displayHelp();
+          await this.displayHelp();
         }
       }
     } else if (runArg != null) {
       this.write(`Command not found: ${runArg}`);
       if (this._meta.showHelpOnNotFound) {
-        this.displayHelp();
+        await this.displayHelp();
       }
     } else if (this._version != null) {
       this._stdout.write(this._version);
     } else if (this._globalOptions?.help) {
-      this.displayHelp();
+      await this.displayHelp();
     }
     if (this._afterInvoke != null) {
       this._afterInvoke(globalOptions);
@@ -629,14 +796,13 @@ class _Zli<TGlobalOptions extends OptionsShape> implements Zli<TGlobalOptions> {
   }
 
   embed(stdin: NodeJS.ReadStream = process.stdin) {
-    const int = readline.createInterface(stdin);
     return new Promise<void>((resolve) => {
       let isRunning = true;
       while (isRunning) {
-        int.question('> ', async (input) => {
+        this._rl.question('> ', async (input) => {
           if (input.match(/\.exit/i)) {
-            int.write('Exiting');
-            int.close();
+            this._rl.write('Exiting');
+            this._rl.close();
             isRunning = false;
           } else {
             await this.exec(input);
@@ -654,10 +820,10 @@ class _Command<
   TOptions extends OptionsShape = EmptyOptions
 > implements Command<TGlobalOptions, TArgs, TOptions>
 {
-  private readonly _commands = new Map<
-    string,
+  private readonly _commands: Record<
+    string | number,
     _Command<TGlobalOptions, any, any>
-  >();
+  > = {};
 
   private _meta: InvokeMeta;
   private _help?: OptionsHelp<TOptions>;
@@ -680,7 +846,8 @@ class _Command<
   constructor(
     private readonly _name: string,
     private readonly _factory: _Zli<TGlobalOptions>,
-    private readonly _parent: _Command<TGlobalOptions, any, any> | null
+    private readonly _parent: _Command<TGlobalOptions, any, any> | null,
+    private readonly _keys: KeyWatcher
   ) {
     this._meta = _factory._meta;
   }
@@ -693,8 +860,8 @@ class _Command<
     }
     const [arg] = args._;
     const slicedArgs = { ...args, _: args._.slice(1) };
-    if (arg != null && this._commands.has(arg)) {
-      return [this._commands.get(arg), slicedArgs];
+    if (arg != null && this._commands[arg] != null) {
+      return [this._commands[arg], slicedArgs];
     }
     return [undefined, slicedArgs];
   }
@@ -738,14 +905,15 @@ class _Command<
     const command = new _Command<TGlobalOptions, TArgs2, TOptions2>(
       name,
       this._factory,
-      this
+      this,
+      this._keys
     );
     const setupCommand = cmd(command) as _Command<
       TGlobalOptions,
       TArgs2,
       TOptions2
     >;
-    this._commands.set(name.toLowerCase(), setupCommand);
+    this._commands[name.toLowerCase()] = setupCommand;
     return this;
   }
 
@@ -770,10 +938,25 @@ class _Command<
     return this as Command<TGlobalOptions, TArgs, TOptions>;
   }
 
+  option<TOptionName extends string, TOptionType extends PermittedZodTypes>(
+    name: TOptionName,
+    type: TOptionType
+  ): Command<
+    TGlobalOptions,
+    TArgs,
+    AddOption<TOptions, TOptionName, TOptionType>
+  > {
+    this._optsSchema = {
+      ...(this._optsSchema ?? {}),
+      [name]: type,
+    } as any;
+    return this;
+  }
+
   options<TOptions extends OptionsShape>(
     opts: TOptions
   ): Command<TGlobalOptions, TArgs, TOptions> {
-    this._optsSchema = opts as any;
+    this._optsSchema = { ...(this._optsSchema ?? {}), ...opts } as any;
     return this as any;
   }
 
@@ -818,8 +1001,7 @@ class _Command<
   }
 
   displayHelp() {
-    // @ts-ignore I have ZERO clue why this is saying it's never
-    const [help] = buildHelpDisplay(
+    const help = buildHelpDisplay(
       this._name,
       this._commands,
       this._description,
@@ -892,7 +1074,11 @@ class _Command<
     );
 
     try {
-      await this._invoke(invokeArgs, this._factory.getStdout());
+      const meta: CommandMeta = {
+        stdout: this._factory.getStdout(),
+        keys: this._keys,
+      };
+      await this._invoke(invokeArgs, meta);
       await this._postinvoke?.(globalOptions);
     } catch (error: any) {
       if (
@@ -941,7 +1127,7 @@ export function zli(opts?: ZliOptions): Zli {
   if (opts.stdout == null) {
     opts.stdout = process.stdout;
   }
-  return new _Zli(opts.stdout!);
+  return new _Zli(opts.stdout!, setupKeys());
 }
 
 /// Helper functions
@@ -1098,12 +1284,12 @@ export function assertNoRequiredArgsAfterOptional(args?: ArgumentsShape) {
 
 export function buildHelpDisplay(
   name: string,
-  commands?: Map<string, _Command<any, any, any>>,
+  commands?: Record<string | number, _Command<any, any, any>>,
   description?: string,
   args?: ArgumentsShape,
   options?: OptionsShape,
   shorthands?: ShorthandDefinitions<any>
-): Result<string[]> {
+): string[] {
   const lines = new Array<string>();
   if (args != null) {
     lines.push('Usage:', '');
@@ -1168,12 +1354,12 @@ export function buildHelpDisplay(
     lines.push('');
   }
   if (commands != null) {
-    for (const [name, command] of commands.entries()) {
+    for (const [name, command] of Object.entries(commands)) {
       const description = command.getDescription();
       lines.push(name, `\t${description}`);
     }
   }
-  return ok(lines);
+  return lines;
 }
 
 /**
@@ -1288,4 +1474,13 @@ function spreadLikeButter(...objs: object[]) {
     }
   }
   return result;
+}
+
+function setupKeys(): KeyWatcher {
+  return {
+    watch(args) {
+      // TODO:
+      return this;
+    },
+  };
 }

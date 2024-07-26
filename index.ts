@@ -14,7 +14,6 @@ export {
   type ZliOptions,
   type Options,
   type OptionsHelp,
-  type WithHelp,
   type Arguments,
   type ShorthandDefinitions,
 } from './zli';
